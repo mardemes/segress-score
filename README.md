@@ -76,3 +76,9 @@ frontend/        página única (upload, confirmação de tipo, relatório)
 - Material suplementar fora do PDF (protocolo, dados) não é lido.
 - Falta validar a nota contra avaliadores humanos (30 a 50 revisões, kappa por item); sem isso, não use a nota para decisões reais.
 - Os itens 2, 4 e outros marcados `RL` no YAML usam regra + LLM; o desenho original previa `R+L` também para 8, 13c e 17, que nesta versão são só LLM.
+
+## Versão web sem servidor (`web/`)
+
+`web/segress-score.html` roda inteira no navegador: lê o PDF com pdf.js, aplica as regras e a nota em JavaScript
+e, quando publicada como página no Claude, usa o próprio Claude da página para julgar os itens que exigem leitura
+(sem chave de API; o uso conta na cota do Claude de quem avalia). Gere-a a partir do checklist com `python web/build.py`.

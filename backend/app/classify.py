@@ -16,6 +16,9 @@ _QUAL = (r'thematic synthesis|meta-?ethnograph|qualitative (evidence )?synthesis
          r'realist (synthesis|review)|framework synthesis|qualitative (systematic )?review|meta-?narrative')
 _QUANT = r'meta-?analysis|systematic (literature )?review|\bSLR\b|effect sizes?|rapid review'
 _ANY_REVIEW = _MAPPING + '|' + _QUAL + '|' + _QUANT + r'|tertiary (study|review)|literature (review|survey)|\bsurvey\b'
+_SELF_REVIEW = (r'\b(we|this (paper|study|article|work))( have)? (conducted|performed|carried out|undertook|present|presents|report|reports) '
+                r'(a|an|the results of a|the results of an) (systematic|tertiary|mapping|scoping|rapid|meta|multivocal|qualitative)|'
+                r'\bthis (systematic )?(literature )?(review|mapping study|SLR|tertiary study|meta-analysis)\b')
 _METHOD_SIGNALS = [
     r'inclusion criteria', r'exclusion criteria', r'search string', r'search (query|strategy)',
     r'primary studies', r'selected studies', r'data extraction', r'quality assessment',
@@ -43,7 +46,8 @@ def classify_rules(doc: Doc) -> dict:
     # o artigo precisa EXECUTAR uma revisão (não apenas falar sobre revisões, como um artigo de diretrizes)
     executed = _count(_EXECUTED, doc.body)
     guideline_title = bool(re.search(r'guidelines?|checklist|reporting standards?|framework for|protocol for|manifesto|position paper', doc.title, re.I))
-    is_systematic = review_in_head and signals >= 4 and executed >= 2 and not (guideline_title and executed < 5)
+    self_review = bool(re.search(_SELF_REVIEW, head, re.I))
+    is_systematic = review_in_head and signals >= 4 and executed >= 2 and (not guideline_title or self_review)
 
     s_map = _count(_MAPPING, head) * 3 + _count(_MAPPING, early)
     s_qual = _count(_QUAL, head) * 3 + _count(_QUAL, early)

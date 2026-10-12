@@ -160,8 +160,9 @@ def extract(pdf_path: str, max_pages: int = 80) -> Doc:
 
 
 def _extract_abstract(doc: Doc) -> str:
-    if doc.sections.get('abstract'):
-        return doc.sections['abstract'][:3000]
+    early = [c.text for c in doc.chunks if c.section == 'abstract' and c.page <= 2]
+    if early:
+        return ' '.join(early)[:3000]
     first = ' '.join(doc.pages[:2])
     m = re.search(r'abstract\W{0,3}(.{200,3000}?)(?:index terms|keywords?|\n\s*(?:1\.?\s+)?introduction)', first, re.I | re.S)
     if m:
