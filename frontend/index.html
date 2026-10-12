@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEGRESS-Score</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #1c2430; --mute: #5d6878; --line: #dfe3e9;
+    --accent: #2457d6; --accent-soft: #e6edfc; --good: #1f8a4c; --warn: #b7791f; --bad: #c0392b;
+    --good-soft: #e3f4ea; --warn-soft: #fbf1dc; --bad-soft: #fbe4e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161c; --card: #1a2029; --ink: #e8ecf2; --mute: #9aa6b6; --line: #2b3441;
+      --accent: #6f9bff; --accent-soft: #1f2c4a; --good: #52c785; --warn: #e0b04d; --bad: #ef7d70;
+      --good-soft: #17301f; --warn-soft: #33290f; --bad-soft: #3a1c18;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  .sub { color: var(--mute); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 32px 16px; text-align: center; cursor: pointer; color: var(--mute); }
+  .drop.over, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+  .drop strong { color: var(--ink); }
+  button, select { font: inherit; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  select { padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); transition: width .4s; }
+  .note { padding: 10px 12px; border-radius: 8px; margin: 10px 0; font-size: 14px; }
+  .note.warn { background: var(--warn-soft); } .note.bad { background: var(--bad-soft); } .note.info { background: var(--accent-soft); }
+  .hidden { display: none !important; }
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+  @media (max-width: 640px) { .hero { grid-template-columns: 1fr; } }
+  .score { font-size: 64px; font-weight: 700; line-height: 1; }
+  .score small { font-size: 22px; color: var(--mute); font-weight: 400; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-weight: 600; font-size: 14px; }
+  .lv-A, .lv-B { background: var(--good-soft); color: var(--good); }
+  .lv-C { background: var(--warn-soft); color: var(--warn); }
+  .lv-D, .lv-E { background: var(--bad-soft); color: var(--bad); }
+  .lv-N { background: var(--accent-soft); color: var(--accent); }
+  .secs { display: grid; gap: 10px; margin-top: 12px; }
+  .sec { display: grid; grid-template-columns: 150px 1fr 48px; gap: 10px; align-items: center; font-size: 14px; }
+  .sec .bar i { background: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--mute); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  tr.item { cursor: pointer; }
+  tr.item:hover td { background: var(--accent-soft); }
+  .pill { display: inline-block; min-width: 38px; text-align: center; padding: 1px 8px; border-radius: 99px; font-weight: 600; font-size: 13px; }
+  .s1 { background: var(--good-soft); color: var(--good); } .s05 { background: var(--warn-soft); color: var(--warn); }
+  .s0 { background: var(--bad-soft); color: var(--bad); } .sn { background: var(--line); color: var(--mute); }
+  .detail td { background: var(--bg); }
+  .detail blockquote { margin: 6px 0; padding: 6px 12px; border-left: 3px solid var(--accent); color: var(--mute); }
+  .tag { font-size: 12px; color: var(--mute); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 4px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tabs button { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .tabs button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  footer { color: var(--mute); font-size: 13px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SEGRESS-Score</h1>
+  <p class="sub">Avalia o quanto uma revisão sistemática de engenharia de software relata o que o checklist SEGRESS (Kitchenham, Madeyski e Budgen, 2023) exige.</p>
+
+  <section class="card" id="uploadCard">
+    <h2>1. Envie o artigo em PDF</h2>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Escolher arquivo PDF">
+      <strong>Arraste o PDF aqui</strong> ou clique para escolher (até 25 MB)
+      <input type="file" id="file" accept="application/pdf" class="hidden">
+    </div>
+    <p class="sub" id="fileName" style="margin:10px 0 0"></p>
+    <div id="health" class="note info" style="margin-top:12px"></div>
+  </section>
+
+  <section class="card hidden" id="progressCard">
+    <h2 id="progressTitle">Processando…</h2>
+    <div class="bar"><i id="progressBar" style="width:0"></i></div>
+    <p class="sub" id="progressMsg" style="margin:8px 0 0"></p>
+  </section>
+
+  <section class="card hidden" id="confirmCard">
+    <h2>2. Confirme o tipo de estudo</h2>
+    <p>O tipo define quais itens são obrigatórios. Classificação automática: <strong id="detType"></strong> <span class="tag" id="detConf"></span></p>
+    <ul id="detReasons" style="color:var(--mute);margin-top:0"></ul>
+    <div id="detMsg" class="note warn hidden"></div>
+    <div class="row">
+      <label>Tipo:
+        <select id="typeSel">
+          <option value="quant">Revisão sistemática quantitativa</option>
+          <option value="mapping">Mapeamento sistemático</option>
+          <option value="qual">Revisão qualitativa</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="tertiary"> Estudo terciário (itens 14 e 15 não se aplicam)</label>
+      <button id="goBtn">Avaliar</button>
+    </div>
+  </section>
+
+  <section class="hidden" id="reportCard">
+    <div class="card">
+      <div class="hero">
+        <div>
+          <div class="score"><span id="rScore">0</span><small>/100</small></div>
+          <span class="badge" id="rLevel"></span>
+        </div>
+        <div>
+          <strong id="rTitle"></strong>
+          <div class="sub" id="rMeta" style="margin:2px 0 0"></div>
+          <div class="secs" id="rSecs"></div>
+        </div>
+      </div>
+      <div id="rNotes"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="ghost" id="changeType">Mudar tipo de estudo</button>
+        <button class="ghost" id="exportBtn">Baixar JSON</button>
+        <button class="ghost" id="printBtn">Imprimir</button>
+        <button class="ghost" id="newBtn">Nova avaliação</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Itens do checklist</h2>
+      <div class="tabs" id="filters"></div>
+      <table>
+        <thead><tr><th>Item</th><th>Descrição</th><th>Peso</th><th>Nota</th><th>Método</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <footer>A nota mede a qualidade do <em>relato</em>, não a validade científica dos resultados. Pesos e limiares de nível são propostas a calibrar com especialistas. Itens com "revisar" têm baixa confiança ou usam nota provisória e merecem conferência humana.</footer>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const STATUS = { queued: 'Na fila…', extracting: 'Extraindo e classificando o texto…', checking: 'Executando as verificações…' };
+const TYPES = { quant: 'Revisão sistemática quantitativa', mapping: 'Mapeamento sistemático', qual: 'Revisão qualitativa' };
+const METHODS = { rule: 'regra', llm: 'LLM', unverified: 'não verificado' };
+const SEC_ORDER = ['titulo_resumo', 'introducao', 'metodos', 'resultados', 'discussao', 'outras'];
+const SEC_NAMES = { titulo_resumo: 'Título e resumo', introducao: 'Introdução', metodos: 'Métodos', resultados: 'Resultados', discussao: 'Discussão', outras: 'Outras informações' };
+let current = null, report = null, filter = 'all', openCode = null, timer = null;
+
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(k));
+  return n;
+}
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.detail || `Erro ${r.status}`);
+  return data;
+}
+function show(...ids) { for (const id of ['uploadCard', 'progressCard', 'confirmCard', 'reportCard']) $(id).classList.toggle('hidden', !ids.includes(id)); }
+
+fetch('/health').then(r => r.json()).then(h => {
+  $('health').textContent = h.llm
+    ? `Modo completo: ${h.items} itens, julgamento por LLM (${h.model}).`
+    : 'Modo parcial: sem chave da API de LLM, só os itens verificáveis por regra são pontuados e o nível não é atribuído se a cobertura for baixa. Defina ANTHROPIC_API_KEY para o modo completo.';
+  $('health').className = 'note ' + (h.llm ? 'info' : 'warn');
+}).catch(() => { $('health').textContent = 'API indisponível.'; $('health').className = 'note bad'; });
+
+const drop = $('drop'), fileInput = $('file');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => fileInput.files[0] && upload(fileInput.files[0]));
+
+async function upload(file) {
+  $('fileName').textContent = file.name;
+  if (!/\.pdf$/i.test(file.name)) { alert('Envie um arquivo PDF.'); return; }
+  const fd = new FormData(); fd.append('file', file);
+  try {
+    show('progressCard'); $('progressTitle').textContent = 'Enviando…';
+    const r = await api('/evaluations', { method: 'POST', body: fd });
+    current = r.id; poll();
+  } catch (e) { show('uploadCard'); alert(e.message); }
+}
+
+function poll() {
+  clearTimeout(timer);
+  api(`/evaluations/${current}`).then(ev => {
+    if (ev.status === 'failed') { show('uploadCard'); alert(ev.error || 'A avaliação falhou.'); return; }
+    if (ev.status === 'needs_confirmation') return showConfirm(ev);
+    if (ev.status === 'done') return loadReport();
+    show('progressCard');
+    $('progressTitle').textContent = STATUS[ev.status] || 'Processando…';
+    $('progressBar').style.width = Math.round(ev.progress * 100) + '%';
+    $('progressMsg').textContent = Math.round(ev.progress * 100) + '%';
+    timer = setTimeout(poll, 1200);
+  }).catch(e => { show('uploadCard'); alert(e.message); });
+}
+
+function showConfirm(ev) {
+  const c = ev.classification || {};
+  show('confirmCard');
+  $('detType').textContent = c.type ? TYPES[c.type] : 'não identificado';
+  $('detConf').textContent = 'confiança ' + Math.round((c.confidence || 0) * 100) + '%';
+  $('detReasons').replaceChildren(...(c.reasons || []).map(r => el('li', {}, r)));
+  $('detMsg').classList.toggle('hidden', !c.message);
+  $('detMsg').textContent = c.message || '';
+  if (c.type) $('typeSel').value = c.type;
+  $('tertiary').checked = !!c.tertiary;
+}
+$('goBtn').addEventListener('click', async () => {
+  try {
+    await api(`/evaluations/${current}/confirm`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ study_type: $('typeSel').value, tertiary: $('tertiary').checked }) });
+    show('progressCard'); $('progressBar').style.width = '20%'; poll();
+  } catch (e) { alert(e.message); }
+});
+$('changeType').addEventListener('click', () => api(`/evaluations/${current}`).then(showConfirm));
+$('newBtn').addEventListener('click', () => { current = null; $('fileName').textContent = ''; fileInput.value = ''; show('uploadCard'); });
+$('exportBtn').addEventListener('click', () => {
+  const a = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })), download: `segress-${current}.json` });
+  a.click();
+});
+$('printBtn').addEventListener('click', () => window.print());
+
+async function loadReport() {
+  const r = await api(`/evaluations/${current}/report`);
+  report = r.report; render(r);
+}
+
+function pill(s) {
+  if (s === null || s === undefined) return el('span', { class: 'pill sn' }, '—');
+  const cls = s === 1 ? 's1' : s === 0.5 ? 's05' : 's0';
+  return el('span', { class: 'pill ' + cls }, String(s).replace('.', ','));
+}
+
+function render(r) {
+  show('reportCard');
+  const rep = r.report;
+  $('rScore').textContent = rep.partial ? '—' : rep.score.toFixed(1).replace('.', ',');
+  const lv = $('rLevel');
+  lv.textContent = rep.level ? `${rep.level} — ${rep.level_name}` : rep.level_name;
+  lv.className = 'badge lv-' + (rep.level || 'N');
+  $('rTitle').textContent = rep.title || r.filename;
+  $('rMeta').textContent = `${TYPES[rep.study_type]}${rep.tertiary ? ' (terciário)' : ''} · cobertura ${Math.round(rep.coverage * 100)}% do peso obrigatório · ` +
+    (rep.partial ? `nota parcial dos itens verificados: ${rep.score.toFixed(1).replace('.', ',')}` : `nota-base ${rep.base} + bônus ${rep.bonus}`);
+  $('rSecs').replaceChildren(...SEC_ORDER.filter(k => rep.by_section[k]).map(k => {
+    const s = rep.by_section[k];
+    return el('div', { class: 'sec' }, el('span', {}, SEC_NAMES[k]), el('div', { class: 'bar' }, el('i', { style: `width:${s.score}%` })), el('span', {}, Math.round(s.score) + '%'));
+  }));
+  const notes = [];
+  if (rep.partial) notes.push(el('div', { class: 'note info' }, 'Nota parcial: menos de 70% do peso obrigatório foi verificado. Sem a API de LLM, itens que exigem leitura ficam fora do cálculo.'));
+  if (rep.capped) notes.push(el('div', { class: 'note warn' }, `Teto aplicado: item(ns) crítico(s) ausente(s) (${rep.critical_missing.join(', ')}) limitam o nível a C.`));
+  const nrev = rep.items.filter(i => i.needs_review && i.applies !== '-').length;
+  if (nrev) notes.push(el('div', { class: 'note info' }, `${nrev} item(ns) marcado(s) para revisão humana.`));
+  $('rNotes').replaceChildren(...notes);
+  renderFilters(rep); renderRows(rep);
+}
+
+function renderFilters(rep) {
+  const defs = [['all', 'Todos'], ['review', 'Revisar'], ['missing', 'Ausentes (0)'], ['partial', 'Parciais (0,5)']];
+  $('filters').replaceChildren(...defs.map(([k, label]) => el('button', { class: filter === k ? 'on' : '', onclick: () => { filter = k; renderFilters(rep); renderRows(rep); } }, label)));
+}
+function renderRows(rep) {
+  const items = rep.items.filter(i => i.applies !== '-').filter(i => {
+    if (filter === 'review') return i.needs_review;
+    if (filter === 'missing') return i.score === 0;
+    if (filter === 'partial') return i.score === 0.5;
+    return true;
+  });
+  const rows = [];
+  for (const i of items) {
+    rows.push(el('tr', { class: 'item', onclick: () => { openCode = openCode === i.code ? null : i.code; renderRows(rep); } },
+      el('td', {}, i.code), el('td', {}, i.title, i.applies === 'P' ? el('span', { class: 'tag' }, 'opcional') : null, i.needs_review ? el('span', { class: 'tag' }, 'revisar') : null),
+      el('td', {}, String(i.weight)), el('td', {}, pill(i.score), i.override !== null && i.override !== undefined ? el('span', { class: 'tag' }, 'ajustado') : null),
+      el('td', {}, METHODS[i.method] || i.method)));
+    if (openCode === i.code) rows.push(detail(i));
+  }
+  $('rows').replaceChildren(...rows);
+}
+function detail(i) {
+  const sel = el('select', { 'aria-label': 'Ajustar nota', onchange: async (e) => {
+    const v = e.target.value === '' ? null : Number(e.target.value);
+    try { const r = await api(`/evaluations/${current}/items/${encodeURIComponent(i.code)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ score: v }) }); report = r.report; render(r); } catch (err) { alert(err.message); }
+  } },
+    el('option', { value: '' }, `Automática (${i.auto_score ?? '—'})`), el('option', { value: '0' }, '0'), el('option', { value: '0.5' }, '0,5'), el('option', { value: '1' }, '1'));
+  sel.value = i.override === null || i.override === undefined ? '' : String(i.override);
+  return el('tr', { class: 'detail' }, el('td', { colspan: '5' },
+    el('div', {}, el('strong', {}, 'Pergunta: '), i.question),
+    i.evidence ? el('blockquote', {}, i.evidence, i.page ? el('span', { class: 'tag' }, 'p. ' + i.page) : null) : el('div', { class: 'sub' }, 'Sem evidência localizada.'),
+    i.missing ? el('div', {}, el('strong', {}, 'O que falta: '), i.missing) : null,
+    i.note ? el('div', { class: 'sub' }, i.note) : null,
+    el('div', { class: 'row', style: 'margin-top:8px' }, el('span', { class: 'sub' }, `Confiança: ${i.confidence == null ? '—' : Math.round(i.confidence * 100) + '%'}`), el('label', {}, 'Ajuste humano: ', sel))));
+}
+</script>
+</body>
+</html>

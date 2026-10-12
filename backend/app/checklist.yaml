@@ -1,0 +1,521 @@
+# Checklist SEGRESS (Kitchenham, Madeyski & Budgen, IEEE TSE 49(3), 2023, Tabela 9).
+# applies: três letras na ordem [quantitativa, mapeamento, qualitativa]
+#   O = obrigatório, P = opcional (só bônus), - = não se aplica.
+# method: R = só regra; RL = regra pré-filtra e LLM julga (sem LLM, a regra vira nota provisória);
+#         L = só LLM (sem LLM, o item fica "não verificado" e sai do cálculo).
+# weight: 1 a 3 (proposta inicial, a calibrar com especialistas; 3 = crítico).
+# sec: seções onde procurar primeiro. kw: palavras-chave para recuperar trechos.
+
+- code: '1'
+  title: Título identifica o tipo de estudo
+  section: titulo_resumo
+  weight: 1
+  applies: OOO
+  method: R
+  rule: title_type
+  sec: [title]
+  q: O título identifica o relatório como revisão sistemática, mapeamento sistemático, estudo terciário, revisão qualitativa ou mista?
+  full: Identifica explicitamente o tipo de estudo secundário.
+  partial: Diz apenas revisão, survey ou levantamento, sem indicar que é sistemática.
+
+- code: '2'
+  title: Resumo estruturado
+  section: titulo_resumo
+  weight: 2
+  applies: OOO
+  method: RL
+  rule: abstract_structured
+  sec: [abstract]
+  kw: []
+  q: O resumo é estruturado e cobre contexto, objetivo, métodos, resultados e conclusão?
+  full: Cobre contexto, objetivo, métodos, resultados e conclusão.
+  partial: Cobre 2 ou 3 dessas partes, ou é um parágrafo corrido que menciona só algumas.
+
+- code: '3'
+  title: Justificativa (rationale)
+  section: introducao
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [introduction]
+  kw: [gap, motivation, rationale, existing reviews, previous reviews, no systematic review, update, lack of]
+  q: A introdução justifica a revisão no contexto do conhecimento existente (lacuna, revisões anteriores, necessidade de atualizar ou de nova revisão)?
+  full: Explica a lacuna ou o motivo da revisão em relação ao que já existe.
+  partial: Descreve o tema e a importância, mas não a lacuna nem as revisões anteriores.
+
+- code: '4'
+  title: Objetivos e questões de pesquisa
+  section: introducao
+  weight: 3
+  applies: OOO
+  method: RL
+  rule: research_questions
+  sec: [introduction, methods]
+  kw: [research question, RQ1, objective, aim of this]
+  q: Os objetivos ou questões de pesquisa estão explícitos e explicam como contribuem para o problema maior?
+  full: Questões de pesquisa ou objetivos explícitos e ligados ao problema.
+  partial: Há objetivo genérico, sem questões explícitas, ou questões sem ligação com o problema.
+
+- code: '5'
+  title: Critérios de elegibilidade
+  section: metodos
+  weight: 3
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [inclusion criteria, exclusion criteria, inclusion, exclusion, language, publication year, period, peer-reviewed, grey literature]
+  q: Os critérios de inclusão e exclusão estão descritos e as restrições da busca (período, idioma, tipo de publicação) estão justificadas?
+  full: Critérios de inclusão e exclusão claros, e restrições de busca com justificativa.
+  partial: Critérios listados, mas sem justificar as restrições de busca (ou só inclusão, ou só exclusão).
+
+- code: '6'
+  title: Fontes de informação e data da busca
+  section: metodos
+  weight: 3
+  applies: OOO
+  method: RL
+  rule: search_sources
+  sec: [methods]
+  kw: [Scopus, IEEE Xplore, ACM Digital Library, Web of Science, ScienceDirect, Google Scholar, databases, search was conducted, last search]
+  q: Os autores listam todas as fontes de busca (bases, registros, pesquisadores contatados) e a data da última busca em cada uma?
+  full: Lista as fontes e informa a data (ou mês/ano) da última busca de cada uma.
+  partial: Lista as fontes, mas não informa as datas, ou informa só para algumas.
+
+- code: '7'
+  title: Estratégia de busca completa
+  section: metodos
+  weight: 3
+  applies: OOO
+  method: RL
+  rule: search_strings
+  sec: [methods]
+  kw: [search string, search query, AND, OR, keywords, snowballing, manual search, pilot search, gold standard]
+  q: A estratégia de busca completa está apresentada (strings de busca de cada base, snowballing, busca manual) de forma que possa ser repetida?
+  full: Strings completas (ou em apêndice referenciado) e demais métodos de busca descritos.
+  partial: Descreve termos ou a estratégia em linhas gerais, sem a string completa.
+
+- code: '8'
+  title: Processo de seleção
+  section: metodos
+  weight: 3
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [reviewers, authors independently, screening, selection, disagreement, kappa, agreement, consensus, pilot, tool]
+  q: O processo de seleção informa quantos revisores avaliaram cada estudo, se foram independentes, como resolveram discordâncias e a concordância medida?
+  full: Informa número de revisores, independência e tratamento de discordâncias (idealmente com concordância medida).
+  partial: Informa parte disso (por exemplo, só que dois autores selecionaram), sem independência ou discordâncias.
+
+- code: '9'
+  title: Processo de coleta de dados
+  section: metodos
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [data extraction, extracted, extraction form, independently, cross-check, validated, contacted authors]
+  q: A coleta de dados informa quantos revisores extraíram dados de cada estudo, se foram independentes e como os dados foram conferidos ou confirmados?
+  full: Informa número de revisores, independência e conferência dos dados.
+  partial: Informa que houve extração (e talvez formulário), sem número de revisores nem conferência.
+
+- code: 10a
+  title: Desfechos (outcomes) buscados
+  section: metodos
+  weight: 2
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [outcome, measure, metric, dependent variable, effect]
+  q: Todos os desfechos para os quais se buscaram dados estão listados, definidos e ligados às questões de pesquisa?
+  full: Desfechos listados e definidos, com relação às questões de pesquisa.
+  partial: Desfechos citados sem definição ou sem relação com as questões.
+
+- code: 10b
+  title: Demais variáveis e classificação
+  section: metodos
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [data items, extracted, variables, classification scheme, attributes, categories, data extraction form, assumptions]
+  q: As demais variáveis extraídas estão listadas e definidas (em mapeamentos, o esquema de classificação usado), incluindo suposições sobre dados ausentes?
+  full: Variáveis (ou esquema de classificação) listadas e definidas.
+  partial: Variáveis listadas sem definições, ou esquema citado sem as categorias.
+
+- code: '11'
+  title: Avaliação de risco de viés / qualidade
+  section: metodos
+  weight: 3
+  applies: OPO
+  method: L
+  sec: [methods]
+  kw: [quality assessment, risk of bias, critical appraisal, quality criteria, checklist, appraisal, quality score]
+  q: Os métodos de avaliação de risco de viés ou qualidade dos estudos incluídos estão descritos (ferramenta, critérios, número de revisores, independência)?
+  full: Ferramenta ou critérios descritos, com número de revisores e independência.
+  partial: Cita que avaliou qualidade ou usou uma ferramenta, sem detalhar critérios ou revisores.
+
+- code: '12'
+  title: Medidas de efeito
+  section: metodos
+  weight: 2
+  applies: OP-
+  method: L
+  sec: [methods]
+  kw: [effect size, effect measure, standardized mean difference, risk ratio, correlation, Cohen, Hedges, odds ratio]
+  q: A medida de efeito usada em cada desfecho está especificada?
+  full: Medida de efeito indicada para cada desfecho.
+  partial: Indica medida de efeito para alguns desfechos ou de forma genérica.
+
+- code: 13a
+  title: Elegibilidade para cada síntese
+  section: metodos
+  weight: 1
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [synthesis, grouped, subgroups, eligible for, categories, group]
+  q: Descreve como se decidiu quais estudos eram elegíveis para cada síntese (agrupamentos)?
+  full: Explica como os estudos foram agrupados para cada síntese.
+  partial: Menciona agrupamentos sem explicar o critério.
+
+- code: 13b
+  title: Preparação dos dados / codificação
+  section: metodos
+  weight: 1
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [missing data, data conversion, coding, inductive, deductive, open coding, codes, imputation]
+  q: Descreve a preparação dos dados para síntese (dados faltantes, conversões) ou, em revisões qualitativas, o processo de codificação (indutivo ou dedutivo)?
+  full: Descreve o tratamento de dados faltantes/conversões ou a codificação e sua natureza.
+  partial: Menciona codificação ou tratamento de dados sem detalhar.
+
+- code: 13c
+  title: Tabulação e visualização
+  section: metodos
+  weight: 1
+  applies: OOO
+  method: L
+  sec: [methods]
+  kw: [table, tables, chart, bubble plot, forest plot, visual, map, plot, graph]
+  q: Descreve os métodos usados para tabular ou visualizar resultados dos estudos individuais e das sínteses?
+  full: Descreve como tabelas, gráficos ou mapas foram construídos.
+  partial: Menciona tabelas ou gráficos sem explicar como foram preparados.
+
+- code: 13d
+  title: Métodos de síntese com justificativa
+  section: metodos
+  weight: 3
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [meta-analysis, random effects, fixed effect, narrative synthesis, thematic synthesis, vote counting, synthesis method, R package, software, qualitative synthesis]
+  q: Os métodos de síntese estão descritos com justificativa da escolha (modelo, método de heterogeneidade, software; em qualitativas, constructos e validação)?
+  full: Método descrito e escolha justificada, com detalhes (modelo, software ou validação).
+  partial: Nomeia o método de síntese sem justificar ou sem detalhes.
+
+- code: 13e
+  title: Análise de sensibilidade (método)
+  section: metodos
+  weight: 1
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [sensitivity analysis, robustness, outlier, deviant case, exclude studies, leave-one-out]
+  q: Descreve métodos de análise de sensibilidade (ou, em qualitativas, discussão do impacto de casos desviantes)?
+  full: Descreve o método de sensibilidade ou de casos desviantes.
+  partial: Menciona que fez sensibilidade, sem detalhar o método.
+
+- code: 13f
+  title: Causas de heterogeneidade (método)
+  section: metodos
+  weight: 1
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [heterogeneity, I2, Q test, subgroup, meta-regression, moderator, differences between studies]
+  q: Descreve métodos para explorar possíveis causas de heterogeneidade entre os resultados?
+  full: Descreve subgrupos, meta-regressão ou outro método.
+  partial: Menciona heterogeneidade sem dizer como foi explorada.
+
+- code: '14'
+  title: Viés de publicação (método)
+  section: metodos
+  weight: 2
+  applies: O-O
+  method: L
+  sec: [methods]
+  kw: [publication bias, funnel plot, Egger, file drawer, trim and fill, grey literature, missing studies]
+  q: Descreve métodos para avaliar o risco de viés por resultados ausentes (viés de publicação)?
+  full: Descreve o método (funnel plot, testes, análise do rigor da busca).
+  partial: Cita viés de publicação sem dizer como foi avaliado.
+
+- code: '15'
+  title: Certeza da evidência (método)
+  section: metodos
+  weight: 3
+  applies: O-O
+  method: RL
+  rule: certainty
+  sec: [methods]
+  kw: [GRADE, CERQual, certainty of evidence, confidence in the evidence, strength of evidence, quality of evidence]
+  q: Descreve o método usado para avaliar a certeza (confiança) no corpo de evidência de cada desfecho (por exemplo GRADE ou GRADE-CERQual)?
+  full: Nomeia o método e explica como foi aplicado.
+  partial: Menciona avaliar a confiança na evidência, sem método ou sem explicar a aplicação.
+
+- code: 16a
+  title: Fluxo de seleção de estudos
+  section: resultados
+  weight: 3
+  applies: OOO
+  method: RL
+  rule: selection_flow
+  sec: [results, methods]
+  kw: [flow diagram, PRISMA, selection process, records, papers, studies were, excluded, after removing duplicates, full text]
+  q: Os resultados da busca e seleção são apresentados, do número de registros identificados ao número de estudos incluídos, idealmente com diagrama de fluxo?
+  full: Números por etapa (identificados, triados, incluídos), idealmente em diagrama.
+  partial: Informa só o total inicial e o final, sem as etapas.
+
+- code: 16b
+  title: Estudos quase incluídos
+  section: resultados
+  weight: 1
+  applies: OPO
+  method: L
+  sec: [results]
+  kw: [excluded, near miss, borderline, full text, reasons for exclusion, exclusion reasons]
+  q: Cita estudos que atenderam a muitos critérios mas foram excluídos e explica por quê?
+  full: Lista os estudos quase incluídos com o motivo da exclusão.
+  partial: Informa motivos de exclusão agregados, sem citar os estudos.
+
+- code: '17'
+  title: Características dos estudos incluídos
+  section: resultados
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [results]
+  kw: [Table, primary studies, selected studies, characteristics, included studies, appendix, list of studies]
+  q: Cita cada estudo incluído e apresenta suas características?
+  full: Cada estudo incluído citado, com características apresentadas.
+  partial: Apresenta características agregadas, ou lista os estudos sem suas características.
+
+- code: '18'
+  title: Risco de viés por estudo
+  section: resultados
+  weight: 3
+  applies: OPO
+  method: L
+  sec: [results]
+  kw: [quality assessment results, risk of bias, quality scores, appraisal results, quality of the primary studies]
+  q: Apresenta a avaliação de risco de viés ou qualidade de cada estudo incluído (e a concordância entre avaliadores)?
+  full: Avaliação por estudo apresentada (tabela ou apêndice).
+  partial: Apresenta só resultados agregados da avaliação de qualidade.
+
+- code: '19'
+  title: Resultados dos estudos individuais
+  section: resultados
+  weight: 2
+  applies: O-O
+  method: L
+  sec: [results]
+  kw: [results of individual studies, effect size, confidence interval, mean, per study, findings of each, major findings]
+  q: Apresenta, para cada desfecho e estudo, estatísticas (ou, em qualitativas, os principais achados de cada estudo)?
+  full: Resultados por estudo apresentados em tabela ou gráfico.
+  partial: Apresenta resultados só de parte dos estudos ou só agregados.
+
+- code: 20a
+  title: Resumo de cada síntese
+  section: resultados
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [results]
+  kw: [results, findings, RQ1, answer to, summary of, themes]
+  q: Resume as características e o risco de viés dos estudos que contribuem para cada síntese (em mapeamentos, discute mapas e tabelas que respondem a cada questão)?
+  full: Cada síntese (ou questão) tem resumo com características e riscos dos estudos contribuintes.
+  partial: Apresenta resultados por questão sem tratar do risco de viés ou das características dos estudos.
+
+- code: 20b
+  title: Resultados estatísticos das sínteses
+  section: resultados
+  weight: 2
+  applies: O--
+  method: L
+  sec: [results]
+  kw: [pooled, overall effect, confidence interval, I2, heterogeneity, forest plot, summary estimate]
+  q: Apresenta resultados das sínteses estatísticas (estimativa resumo com precisão e medidas de heterogeneidade)?
+  full: Estimativa resumo com intervalo de confiança e heterogeneidade.
+  partial: Apresenta estimativas sem precisão ou sem heterogeneidade.
+
+- code: 20c
+  title: Resultados das análises de sensibilidade
+  section: resultados
+  weight: 1
+  applies: O-O
+  method: L
+  sec: [results]
+  kw: [sensitivity analysis, robust, removing, leave-one-out, deviant cases]
+  q: Apresenta resultados das análises de sensibilidade (ou, em qualitativas, casos desviantes)?
+  full: Resultados apresentados.
+  partial: Menciona que a análise foi feita sem mostrar resultados.
+
+- code: 20d
+  title: Resultados sobre causas de heterogeneidade
+  section: resultados
+  weight: 1
+  applies: O-P
+  method: L
+  sec: [results]
+  kw: [heterogeneity, moderator, subgroup analysis, explain differences, contextual factors]
+  q: Apresenta resultados das investigações de causas de heterogeneidade (ou fatores que expliquem diferenças entre estudos)?
+  full: Resultados apresentados.
+  partial: Cita heterogeneidade sem resultados da investigação.
+
+- code: '21'
+  title: Viés de publicação (resultados)
+  section: resultados
+  weight: 2
+  applies: O--
+  method: L
+  sec: [results]
+  kw: [publication bias, funnel plot, Egger, small-study effects]
+  q: Apresenta os resultados da avaliação de viés de publicação para cada síntese?
+  full: Resultados apresentados (por exemplo funnel plot).
+  partial: Comenta o risco de viés de publicação sem resultado da avaliação.
+
+- code: '22'
+  title: Certeza da evidência por desfecho
+  section: resultados
+  weight: 3
+  applies: O-O
+  method: L
+  sec: [results]
+  kw: [GRADE, certainty, confidence in the evidence, strength of evidence, CERQual, low certainty, high certainty]
+  q: Apresenta a avaliação de certeza (confiança) no corpo de evidência de cada desfecho?
+  full: Certeza apresentada por desfecho.
+  partial: Comenta a força da evidência de forma geral, sem avaliação por desfecho.
+
+- code: 23a
+  title: Interpretação geral
+  section: discussao
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [discussion]
+  kw: [compared with, in line with, consistent with, previous reviews, contrary to, interpretation]
+  q: A discussão interpreta os resultados no contexto de outras evidências (outras revisões sobre o mesmo tema)?
+  full: Interpretação com comparação a outras revisões ou evidências.
+  partial: Interpreta os resultados sem compará-los a outros trabalhos.
+
+- code: 23b
+  title: Limitações da evidência incluída
+  section: discussao
+  weight: 3
+  applies: O-O
+  method: L
+  sec: [discussion]
+  kw: [limitations of the primary studies, quality of primary studies, threats to validity, small samples, risk of bias, applicability]
+  q: Discute limitações da evidência incluída (completude, aplicabilidade, incertezas, risco de viés dos estudos primários)?
+  full: Discute limitações dos estudos primários e seu efeito nas conclusões.
+  partial: Menciona limitações da evidência de forma genérica.
+
+- code: 23c
+  title: Limitações do processo da revisão
+  section: discussao
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [discussion, methods]
+  kw: [threats to validity, limitations, bias, single reviewer, language, search limited, incomplete, mitigation]
+  q: Discute limitações do processo da revisão (apenas questões não tratadas antes nos Métodos) e seu efeito possível nos resultados?
+  full: Discute limitações do processo e o possível impacto nos achados.
+  partial: Lista limitações do processo sem discutir o impacto.
+
+- code: 23d
+  title: Implicações para prática, política e pesquisa
+  section: discussao
+  weight: 2
+  applies: OOO
+  method: L
+  sec: [discussion]
+  kw: [implications, practitioners, researchers, future research, recommendations, future work, research agenda]
+  q: Discute implicações dos resultados para prática, política e pesquisa futura (em mapeamentos basta pesquisa futura)?
+  full: Implicações claras e ligadas aos resultados.
+  partial: Cita implicações ou trabalhos futuros de forma genérica.
+
+- code: 24a
+  title: Registro da revisão
+  section: outras
+  weight: 2
+  applies: PPP
+  method: RL
+  rule: registration
+  sec: [methods, abstract]
+  kw: [registered, registration, PROSPERO, OSF, protocol]
+  q: Informa onde a revisão foi registrada (nome do registro e número) ou declara que não foi registrada?
+  full: Registro com nome e número, ou declaração de não registro.
+  partial: Menciona protocolo ou registro sem os dados do registro.
+
+- code: 24b
+  title: Acesso ao protocolo
+  section: outras
+  weight: 2
+  applies: OPO
+  method: L
+  sec: [methods]
+  kw: [protocol, review protocol, pre-defined, available at, publicly available]
+  q: Indica onde o protocolo pode ser acessado ou declara que não houve protocolo?
+  full: Indica onde o protocolo está ou declara que não existe.
+  partial: Diz que seguiu um protocolo, sem indicar onde acessá-lo.
+
+- code: 24c
+  title: Emendas ao protocolo
+  section: outras
+  weight: 1
+  applies: OPO
+  method: L
+  sec: [methods]
+  kw: [deviation, amendment, changes to the protocol, changed from protocol, protocol deviations, adapted]
+  q: Descreve e explica alterações em relação ao registro ou protocolo (ou declara que não houve)?
+  full: Descreve e justifica as alterações (ou declara que não houve).
+  partial: Menciona desvios sem explicar.
+
+- code: '25'
+  title: Financiamento e apoio
+  section: outras
+  weight: 1
+  applies: OOO
+  method: RL
+  rule: funding
+  sec: [acknowledgments, back]
+  kw: [funded by, funding, financial support, grant, sponsor, supported by, no funding]
+  q: Descreve fontes de apoio financeiro e não financeiro e o papel dos financiadores (ou declara que não houve)?
+  full: Fontes e papel dos financiadores (ou declaração de ausência).
+  partial: Cita agradecimento ou apoio sem detalhar a fonte ou o papel.
+
+- code: '26'
+  title: Conflitos de interesse
+  section: outras
+  weight: 1
+  applies: OOO
+  method: RL
+  rule: coi
+  sec: [acknowledgments, back]
+  kw: [conflict of interest, competing interests, declare]
+  q: Declara os conflitos de interesse dos autores (ou a ausência deles)?
+  full: Declaração presente.
+  partial: Menção vaga, sem declaração clara.
+
+- code: '27'
+  title: Disponibilidade de dados, código e materiais
+  section: outras
+  weight: 1
+  applies: PPP
+  method: R
+  rule: data_availability
+  sec: [back, methods]
+  kw: [Zenodo, Figshare, GitHub, replication package, supplementary material, data availability]
+  q: Informa quais materiais (formulários, dados extraídos, código) estão públicos e onde?
+  full: Repositório público citado.
+  partial: Diz que há material suplementar ou dados sob demanda, sem repositório.
