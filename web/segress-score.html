@@ -1,144 +1,150 @@
 <title>SEGRESS-Score</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: parecer de revisor — trilho estreito à esquerda (envio, tipo, escala), relatório à direita; uma coluna no celular. */
+/* Layout: mesa de leitura calma. Trilho à esquerda (enviar, tipo, método), relatório à direita; uma coluna no celular.
+   Superfícies sem borda, sombra leve, cantos generosos; cor só onde há significado. */
 :root {
-  --bg: #f5f7f8; --surface: #ffffff; --ink: #172126; --mute: #5a6b73; --line: #dbe2e5;
-  --accent: #0e5c63; --accent-soft: #e2eff0;
-  --good: #1d7a45; --good-soft: #e1f2e7; --warn: #9a6a00; --warn-soft: #f8efd8; --bad: #b3362b; --bad-soft: #f9e3e0;
-  --na: #8a989e;
+  --bg: #eef3f1; --surface: #ffffff; --surface-2: #f6f9f8; --ink: #1f2b2d; --mute: #66777a; --line: #e2e9e7;
+  --accent: #3a7f79; --accent-soft: #e2efec; --accent-ink: #ffffff;
+  --good: #2e8558; --good-soft: #e3f2e9; --warn: #a8761a; --warn-soft: #f7efdc; --bad: #bb5448; --bad-soft: #f8e6e3; --na: #9aa8aa;
+  --shadow: 0 1px 2px rgba(28, 52, 50, .05), 0 6px 20px rgba(28, 52, 50, .06);
   --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
   --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1518; --surface: #162024; --ink: #e4ecee; --mute: #93a5ac; --line: #26343a;
-  --accent: #5fc0c6; --accent-soft: #173238;
-  --good: #5cc98a; --good-soft: #15301f; --warn: #e3b552; --warn-soft: #33290f; --bad: #f08a7e; --bad-soft: #3a1d19;
-  --na: #6d7f86; color-scheme: dark;
+  --bg: #121819; --surface: #1a2224; --surface-2: #1f292b; --ink: #e2ebe9; --mute: #95a6a6; --line: #2a3537;
+  --accent: #79c2ba; --accent-soft: #1d3432; --accent-ink: #10201f;
+  --good: #69c993; --good-soft: #17301f; --warn: #e2b45a; --warn-soft: #33291a; --bad: #ee8d80; --bad-soft: #3a201c; --na: #6f8183;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25); color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --bg: #0f1518; --surface: #162024; --ink: #e4ecee; --mute: #93a5ac; --line: #26343a;
-  --accent: #5fc0c6; --accent-soft: #173238;
-  --good: #5cc98a; --good-soft: #15301f; --warn: #e3b552; --warn-soft: #33290f; --bad: #f08a7e; --bad-soft: #3a1d19;
-  --na: #6d7f86; color-scheme: dark;
+  --bg: #121819; --surface: #1a2224; --surface-2: #1f292b; --ink: #e2ebe9; --mute: #95a6a6; --line: #2a3537;
+  --accent: #79c2ba; --accent-soft: #1d3432; --accent-ink: #10201f;
+  --good: #69c993; --good-soft: #17301f; --warn: #e2b45a; --warn-soft: #33291a; --bad: #ee8d80; --bad-soft: #3a201c; --na: #6f8183;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25); color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--f-body); }
-.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; }
-header.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin-bottom: 22px; }
-h1 { font: 650 30px/1.1 var(--f-display); margin: 0; letter-spacing: -0.01em; }
-.lede { color: var(--mute); margin: 0; max-width: 62ch; }
-h2 { font: 650 19px/1.25 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
-h3 { font: 600 12px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); margin: 0 0 8px; }
-.grid { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
-.rail { display: grid; gap: 14px; }
-.main { display: grid; gap: 16px; min-width: 0; }
-.drop { display: grid; gap: 6px; place-items: center; text-align: center; border: 1.5px dashed var(--line); border-radius: 8px; padding: 26px 12px; cursor: pointer; color: var(--mute); }
-.drop strong { color: var(--ink); font-weight: 600; }
-.drop.over, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
-button, select { font: inherit; }
-.btn { background: var(--accent); color: var(--surface); border: 0; border-radius: 7px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
-.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); font-weight: 500; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn:focus-visible, select:focus-visible, .seg button:focus-visible, .row-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-select { padding: 7px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); width: 100%; }
-label.chk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; }
-.stack { display: grid; gap: 10px; }
-.note { font-size: 13.5px; padding: 9px 11px; border-radius: 7px; background: var(--accent-soft); }
-.note.warn { background: var(--warn-soft); } .note.bad { background: var(--bad-soft); }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+.topbar { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 3px; z-index: 10; pointer-events: none; }
+.topbar i { display: block; height: 100%; width: 0; background: var(--accent); opacity: .85; transition: width .35s ease, opacity .4s ease; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 72px; }
+header.top { margin-bottom: 28px; display: grid; gap: 6px; }
+h1 { font: 600 32px/1.1 var(--f-display); margin: 0; letter-spacing: -0.01em; }
+.lede { color: var(--mute); margin: 0; max-width: 68ch; }
+h2 { font: 600 19px/1.3 var(--f-display); margin: 0; text-wrap: balance; }
+.eyebrow { font: 600 11.5px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--mute); margin: 0; }
+.grid { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 880px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+.rail, .main { display: grid; gap: 18px; min-width: 0; }
+.stack { display: grid; gap: 12px; }
 .small { font-size: 13px; color: var(--mute); }
-.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 14px; }
-.steps li { display: flex; gap: 8px; align-items: center; color: var(--mute); }
-.steps li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; }
-.steps li.on { color: var(--ink); } .steps li.on::before { border-color: var(--accent); background: var(--accent-soft); }
-.steps li.done::before { background: var(--accent); border-color: var(--accent); }
-.legend { display: grid; gap: 4px; font-size: 13px; }
-.legend div { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; }
-.legend b { font-family: var(--f-mono); }
-.legend span:last-child { font-variant-numeric: tabular-nums; color: var(--mute); }
-
-/* Relatório */
-.hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: center; }
-@media (max-width: 560px) { .hero { grid-template-columns: minmax(0, 1fr); } }
-.score { font: 650 64px/1 var(--f-display); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.score small { font: 400 20px var(--f-body); color: var(--mute); margin-left: 2px; }
-.level { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; margin-top: 8px; padding: 3px 10px; border-radius: 99px; font-size: 14px; }
-.lv-A, .lv-B { background: var(--good-soft); color: var(--good); }
-.lv-C { background: var(--warn-soft); color: var(--warn); }
-.lv-D, .lv-E { background: var(--bad-soft); color: var(--bad); }
-.lv-N { background: var(--accent-soft); color: var(--accent); }
-.doc-title { font: 600 17px/1.35 var(--f-display); margin: 0 0 4px; overflow-wrap: anywhere; }
-.scale { position: relative; margin: 14px 0 4px; }
-.scale .bands { display: grid; grid-template-columns: 40fr 20fr 15fr 15fr 10fr; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; }
-.scale .bands i:nth-child(1), .scale .bands i:nth-child(2) { background: var(--bad-soft); }
-.scale .bands i:nth-child(3) { background: var(--warn-soft); }
-.scale .bands i:nth-child(4), .scale .bands i:nth-child(5) { background: var(--good-soft); }
-.scale .ticks { display: grid; grid-template-columns: 40fr 20fr 15fr 15fr 10fr; font: 11px var(--f-mono); color: var(--mute); margin-top: 4px; }
-.scale .marker { position: absolute; top: -4px; width: 3px; height: 18px; background: var(--ink); border-radius: 2px; transform: translateX(-50%); transition: left .4s; }
-.secs { display: grid; gap: 7px; margin-top: 14px; }
-.sec { display: grid; grid-template-columns: 140px minmax(0, 1fr) 44px; gap: 10px; align-items: center; font-size: 13.5px; }
-.bar { height: 7px; border-radius: 4px; background: var(--line); overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--accent); }
-.sec span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.flags { display: grid; gap: 8px; margin-top: 12px; }
-
-.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.filters button { background: transparent; border: 1px solid var(--line); color: var(--ink); border-radius: 99px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
-.filters button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
-.group-h { font: 600 12px var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); padding: 14px 0 6px; border-bottom: 1px solid var(--line); }
-.row { border-bottom: 1px solid var(--line); }
-.row-h { width: 100%; display: grid; grid-template-columns: 46px minmax(0, 1fr) 52px 46px; gap: 10px; align-items: center; padding: 9px 4px; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; }
-.row-h:hover { background: var(--accent-soft); }
-.code { font: 600 13px var(--f-mono); color: var(--accent); }
-.ttl { min-width: 0; }
-.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: middle; }
-.chip { font-size: 11.5px; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; color: var(--mute); white-space: nowrap; }
-.chip.rev { border-color: var(--warn); color: var(--warn); }
-.weight { font: 12px var(--f-mono); color: var(--mute); letter-spacing: 1px; }
-.pill { display: inline-block; min-width: 40px; text-align: center; border-radius: 99px; padding: 1px 7px; font: 600 13px var(--f-mono); }
-.s1 { background: var(--good-soft); color: var(--good); } .s05 { background: var(--warn-soft); color: var(--warn); }
-.s0 { background: var(--bad-soft); color: var(--bad); } .sn { background: var(--line); color: var(--na); }
-.detail { padding: 4px 4px 14px 60px; display: grid; gap: 8px; font-size: 14px; }
-@media (max-width: 560px) { .detail { padding-left: 4px; } .row-h { grid-template-columns: 40px minmax(0, 1fr) 46px; } .weight { display: none; } }
-blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: var(--bg); font-family: var(--f-display); font-size: 15px; overflow-wrap: anywhere; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.seg button { background: transparent; border: 0; border-right: 1px solid var(--line); color: var(--ink); padding: 3px 10px; cursor: pointer; font: 13px var(--f-mono); }
-.seg button:last-child { border-right: 0; }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
-.foot { color: var(--mute); font-size: 13px; margin-top: 18px; max-width: 80ch; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-/* v2: avaliação por item */
+.drop { display: grid; gap: 4px; place-items: center; text-align: center; background: var(--surface-2); border: 1.5px dashed var(--line); border-radius: 12px; padding: 28px 14px; cursor: pointer; color: var(--mute); transition: border-color .2s, background .2s; }
+.drop strong { color: var(--ink); font-weight: 600; }
+.drop:hover, .drop.over, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+button, select { font: inherit; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 9px 16px; font-weight: 600; cursor: pointer; transition: filter .2s; }
+.btn:hover { filter: brightness(1.05); }
+.btn.soft { background: var(--accent-soft); color: var(--accent); }
+.btn.link { background: none; color: var(--mute); padding: 4px 0; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn:focus-visible, select:focus-visible, .chipbtn:focus-visible, .row-h:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); width: 100%; }
+label.chk { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; }
+label.chk input { margin-top: 4px; accent-color: var(--accent); }
+.note { font-size: 13.5px; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); }
+.note.warn { background: var(--warn-soft); } .note.bad { background: var(--bad-soft); }
+.progress { display: grid; gap: 8px; }
+.progress .track { height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress .track i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width .35s ease; }
+.progress .meta { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--mute); }
+.progress .meta b { font: 500 12.5px var(--f-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
 .method p { margin: 0; font-size: 13.5px; }
-.legend div { grid-template-columns: 92px 1fr; }
-.legend b { font-family: var(--f-body); font-weight: 600; }
-.rating { font: 650 40px/1.05 var(--f-display); letter-spacing: -0.01em; }
-.r-otimo { color: var(--good); } .r-bom { color: var(--accent); } .r-ruim { color: var(--warn); } .r-mruim { color: var(--bad); } .r-ind { color: var(--mute); }
-.score-line { font: 600 26px/1.2 var(--f-display); font-variant-numeric: tabular-nums; margin-top: 6px; }
-.score-line small { font: 400 15px var(--f-body); color: var(--mute); margin-left: 2px; }
-.bar.big { height: 10px; margin: 12px 0 8px; }
-.counts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13.5px; }
-.cnt.bad { color: var(--bad); font-weight: 600; } .cnt.warn { color: var(--warn); font-weight: 600; }
-.row-head { display: grid; grid-template-columns: 46px minmax(0, 1fr) 64px 70px; gap: 10px; padding: 0 4px 4px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--mute); }
-.row-h { grid-template-columns: 46px minmax(0, 1fr) 64px 70px; align-items: start; }
-.row.crit .code { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.legend { display: grid; gap: 6px; font-size: 13px; }
+.legend div { display: grid; grid-template-columns: 88px 1fr; gap: 8px; align-items: baseline; }
+.legend b { font-weight: 600; }
+details.method summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+details.method summary::-webkit-details-marker { display: none; }
+details.method summary::after { content: "+"; color: var(--mute); font-size: 18px; }
+details.method[open] summary::after { content: "−"; }
+details.method[open] summary { margin-bottom: 12px; }
+
+/* relatório */
+.hero { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 22px; align-items: stretch; }
+@media (max-width: 600px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.verdict { border-radius: 14px; padding: 18px; display: grid; gap: 4px; align-content: center; background: var(--surface-2); }
+.verdict.r-otimo { background: var(--good-soft); } .verdict.r-bom { background: var(--accent-soft); } .verdict.r-ruim { background: var(--warn-soft); } .verdict.r-mruim { background: var(--bad-soft); }
+.rating { font: 600 38px/1.05 var(--f-display); letter-spacing: -0.01em; }
+.r-otimo .rating { color: var(--good); } .r-bom .rating { color: var(--accent); } .r-ruim .rating { color: var(--warn); } .r-mruim .rating { color: var(--bad); } .r-ind .rating { color: var(--mute); }
+.score-line { font: 600 22px/1.3 var(--f-display); font-variant-numeric: tabular-nums; }
+.score-line small { font: 400 14px var(--f-body); color: var(--mute); }
+.doc-title { font: 600 18px/1.35 var(--f-display); margin: 4px 0 4px; overflow-wrap: anywhere; }
+.dist { display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: var(--line); margin: 14px 0 8px; gap: 2px; }
+.dist i { display: block; height: 100%; }
+.dist .d-sim { background: var(--good); opacity: .75; } .dist .d-par { background: var(--warn); opacity: .7; } .dist .d-nao { background: var(--bad); opacity: .7; } .dist .d-pen { background: var(--na); opacity: .5; }
+.dist-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--mute); }
+.dist-key span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: currentColor; }
+.k-sim { color: var(--good); } .k-par { color: var(--warn); } .k-nao { color: var(--bad); } .k-pen { color: var(--na); }
+.dist-key span { color: var(--mute); }
+.dist-key span.k-sim::before { background: var(--good); } .dist-key span.k-par::before { background: var(--warn); } .dist-key span.k-nao::before { background: var(--bad); } .dist-key span.k-pen::before { background: var(--na); }
+.secs { display: grid; gap: 8px; margin-top: 18px; }
+.sec { display: grid; grid-template-columns: 140px minmax(0, 1fr) 40px; gap: 12px; align-items: center; font-size: 13px; color: var(--mute); }
+.sec .bar { height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.sec .bar i { display: block; height: 100%; background: var(--accent); opacity: .7; border-radius: 99px; }
+.sec span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; margin-top: 4px; }
+.facts .bad { color: var(--bad); } .facts .warn { color: var(--warn); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+.flags { display: grid; gap: 8px; margin-top: 14px; }
+
+.recs { display: grid; gap: 12px; counter-reset: rec; margin: 14px 0 0; padding: 0; list-style: none; }
+.recs li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); }
+.recs .code { padding-top: 1px; }
+.recs p { margin: 2px 0 0; font-size: 14px; }
+.recs .why { color: var(--mute); font-size: 13px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 6px; }
+.chipbtn { background: var(--surface-2); border: 0; color: var(--ink); border-radius: 99px; padding: 5px 13px; font-size: 13px; cursor: pointer; }
+.chipbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.group-h { font: 600 11.5px var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--mute); padding: 18px 4px 6px; }
+.row { border-radius: 12px; }
+.row + .row { margin-top: 2px; }
+.row-h { width: 100%; display: grid; grid-template-columns: 42px minmax(0, 1fr) 66px 74px; gap: 12px; align-items: start; padding: 10px 8px; background: none; border: 0; border-radius: 12px; color: inherit; text-align: left; cursor: pointer; font: inherit; transition: background .15s; }
+.row-h:hover, .row.open .row-h { background: var(--surface-2); }
+.code { font: 500 13px var(--f-mono); color: var(--accent); padding-top: 1px; }
+.ttl { min-width: 0; }
+.ttl b { font-weight: 500; }
+.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: 1px; }
+.chip { font-size: 11px; border-radius: 99px; padding: 0 8px; background: var(--surface-2); color: var(--mute); white-space: nowrap; }
+.chip.crit { background: var(--accent-soft); color: var(--accent); } .chip.rev { background: var(--warn-soft); color: var(--warn); }
 .just { display: block; font-size: 13px; color: var(--mute); margin-top: 2px; }
-.pts { font: 13px var(--f-mono); font-variant-numeric: tabular-nums; color: var(--mute); padding-top: 2px; }
-.pill { min-width: 58px; }
-.chip.crit { border-color: var(--accent); color: var(--accent); }
-.sub { display: grid; gap: 4px; padding: 8px 0; border-top: 1px dashed var(--line); }
-@media (max-width: 560px) { .row-head { display: none; } .row-h { grid-template-columns: 40px minmax(0, 1fr) 64px; } .pts { display: none; } }
+.pts { font: 12.5px var(--f-mono); font-variant-numeric: tabular-nums; color: var(--mute); padding-top: 2px; text-align: right; }
+.pill { display: inline-block; min-width: 66px; text-align: center; border-radius: 99px; padding: 1px 8px; font-size: 12.5px; font-weight: 600; }
+.s1 { background: var(--good-soft); color: var(--good); } .s05 { background: var(--warn-soft); color: var(--warn); }
+.s0 { background: var(--bad-soft); color: var(--bad); } .sn { background: var(--surface-2); color: var(--na); }
+.detail { padding: 6px 8px 16px 62px; display: grid; gap: 10px; font-size: 14px; }
+.reco { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; }
+.sub { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
+blockquote { margin: 0; padding: 6px 12px; border-left: 3px solid var(--accent); font-family: var(--f-display); font-size: 15px; color: var(--ink); overflow-wrap: anywhere; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 99px; padding: 2px; gap: 2px; }
+.seg button { background: transparent; border: 0; color: var(--ink); padding: 3px 11px; border-radius: 99px; cursor: pointer; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--surface); box-shadow: var(--shadow); font-weight: 600; }
+.foot { color: var(--mute); font-size: 13px; margin: 18px 0 0; max-width: 80ch; }
+@media (max-width: 600px) {
+  .row-h { grid-template-columns: 34px minmax(0, 1fr) 70px; } .pts { display: none; } .detail { padding-left: 8px; }
+  .sec { grid-template-columns: 110px minmax(0, 1fr) 36px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
+<div class="topbar" aria-hidden="true"><i id="topBar"></i></div>
 <div class="wrap">
   <header class="top">
     <h1>SEGRESS-Score</h1>
-    <p class="lede">Avalia, item a item, o quanto um estudo secundário ou terciário de engenharia de software relata os 28 itens do checklist SEGRESS (Kitchenham, Madeyski e Budgen, IEEE TSE 2023), com pontos, justificativa e uma classificação de Muito ruim a Ótimo.</p>
+    <p class="lede">Avalia, item a item, o quanto um estudo secundário ou terciário de engenharia de software relata os 28 itens do checklist SEGRESS (Kitchenham, Madeyski e Budgen, IEEE TSE 2023), com pontos, justificativas, recomendações e uma classificação de Muito ruim a Ótimo.</p>
   </header>
 
   <div class="grid">
@@ -149,6 +155,11 @@ blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--accent);
           <strong>Arraste o PDF aqui</strong>
           <span class="small">ou clique para escolher. O arquivo é lido só no seu navegador.</span>
           <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+        </div>
+        <div class="progress" id="prog" hidden aria-live="polite">
+          <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progTrack"><i id="progBar"></i></div>
+          <div class="meta"><span id="progLabel">Lendo o PDF…</span><b id="progPct">0%</b></div>
+          <div><button class="btn link" id="stopBtn" hidden>Parar</button></div>
         </div>
         <div id="aiNote" class="note">Verificando se o Claude está disponível nesta página…</div>
       </section>
@@ -169,89 +180,94 @@ blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--accent);
         <button class="btn" id="goBtn">Avaliar</button>
       </section>
 
-      <section class="panel" id="progPanel" hidden aria-live="polite">
-        <h2>Avaliando</h2>
-        <ul class="steps" id="steps"></ul>
-        <div class="actions"><button class="btn ghost" id="stopBtn">Parar</button></div>
-      </section>
-
-      <section class="panel stack method" aria-labelledby="h-method">
-        <h3 id="h-method">Como a avaliação é feita</h3>
-        <p><strong>28 itens</strong> da Tabela 9 do SEGRESS: os 27 do PRISMA 2020 mais a Abertura (Opening). Itens com subitens (10, 13, 16, 20, 23, 24) recebem Sim só quando todos os subitens obrigatórios são atendidos.</p>
-        <p><strong>Cada item:</strong> Sim = 1, Parcial = 0,5, Não = 0, a pontuação usada por Kitchenham et al. (2009) em estudos terciários de ES. Informação ausente conta como Não.</p>
-        <p><strong>Peso 2</strong> para os 10 itens críticos (5, 6, 7, 8, 11, 13, 15, 16, 22, 23), que correspondem às informações essenciais da Tabela 2 do SEGRESS; peso 1 para os demais.</p>
-        <p><strong>Score</strong> = pontos obtidos ÷ pontos possíveis, só nos itens obrigatórios para o tipo de estudo.</p>
-        <div class="legend">
-          <div><b class="r-otimo">Ótimo</b><span>nenhuma falha crítica e até 1 fraqueza</span></div>
-          <div><b class="r-bom">Bom</b><span>nenhuma falha crítica, 2 ou mais fraquezas</span></div>
-          <div><b class="r-ruim">Ruim</b><span>1 falha crítica</span></div>
-          <div><b class="r-mruim">Muito ruim</b><span>2 ou mais falhas críticas</span></div>
+      <details class="panel method" open>
+        <summary><span class="eyebrow">Como a avaliação é feita</span></summary>
+        <div class="stack">
+          <p><strong>28 itens</strong> da Tabela 9 do SEGRESS: os 27 do PRISMA 2020 mais a Abertura (Opening). Itens com subitens (10, 13, 16, 20, 23, 24) recebem Sim só quando todos os subitens obrigatórios são atendidos.</p>
+          <p><strong>Cada item:</strong> Sim = 1, Parcial = 0,5, Não = 0, como em Kitchenham et al. (2009). Informação ausente conta como Não.</p>
+          <p><strong>Peso 2</strong> nos 10 itens críticos (5, 6, 7, 8, 11, 13, 15, 16, 22, 23), as informações essenciais da Tabela 2 do SEGRESS; peso 1 nos demais.</p>
+          <p><strong>Score</strong> = pontos obtidos ÷ pontos possíveis nos itens obrigatórios para o tipo de estudo.</p>
+          <div class="legend">
+            <div><b style="color:var(--good)">Ótimo</b><span>nenhuma falha crítica e até 1 fraqueza</span></div>
+            <div><b style="color:var(--accent)">Bom</b><span>nenhuma falha crítica, 2 ou mais fraquezas</span></div>
+            <div><b style="color:var(--warn)">Ruim</b><span>1 falha crítica</span></div>
+            <div><b style="color:var(--bad)">Muito ruim</b><span>2 ou mais falhas críticas</span></div>
+          </div>
+          <p class="small">Regra do AMSTAR 2 (Shea et al., 2017): falha crítica = item crítico com Não; fraqueza = item não crítico com Não.</p>
         </div>
-        <p class="small" style="margin:0">Classificação pela regra do AMSTAR 2 (Shea et al., 2017): falha crítica = item crítico com Não; fraqueza = item não crítico com Não.</p>
-      </section>
+      </details>
     </aside>
 
     <main class="main">
       <section class="panel" id="reportPanel" aria-labelledby="rTitle">
-        <h3 id="rKind">Exemplo</h3>
         <div class="hero">
-          <div class="verdict">
+          <div class="verdict" id="rVerdict">
+            <p class="eyebrow" id="rKind">Exemplo</p>
             <div class="rating" id="rRating">—</div>
-            <div class="score-line"><span id="rScore">—</span><small>/100</small></div>
+            <div class="score-line"><span id="rScore">—</span><small> /100</small></div>
             <div class="small" id="rPoints"></div>
           </div>
           <div style="min-width:0">
             <p class="doc-title" id="rTitle"></p>
             <div class="small" id="rMeta"></div>
-            <div class="bar big" role="img" id="rBarWrap"><i id="rBar" style="width:0"></i></div>
-            <div class="counts" id="rCounts"></div>
+            <div class="facts" id="rFacts"></div>
+            <div class="dist" id="rDist" role="img"></div>
+            <div class="dist-key" id="rDistKey"></div>
           </div>
         </div>
         <div class="secs" id="rSecs"></div>
         <div class="flags" id="rFlags"></div>
         <div class="actions">
-          <button class="btn" id="demoAiBtn" hidden>Avaliar o exemplo com o Claude</button>
-          <button class="btn ghost" id="retypeBtn" hidden>Mudar tipo de estudo</button>
-          <button class="btn ghost" id="exportBtn" hidden>Baixar relatório (JSON)</button>
+          <button class="btn" id="pdfBtn" hidden>Exportar relatório (PDF)</button>
+          <button class="btn soft" id="demoAiBtn" hidden>Avaliar o exemplo com o Claude</button>
+          <button class="btn soft" id="retypeBtn" hidden>Mudar tipo de estudo</button>
+          <button class="btn link" id="jsonBtn" hidden>Dados em JSON</button>
+          <span class="small" id="exportMsg" aria-live="polite"></span>
         </div>
       </section>
 
+      <section class="panel" id="recPanel" hidden aria-labelledby="h-recs">
+        <p class="eyebrow">Prioridades</p>
+        <h2 id="h-recs">O que melhorar no relato</h2>
+        <ol class="recs" id="recs"></ol>
+      </section>
+
       <section class="panel" aria-labelledby="h-items">
+        <p class="eyebrow">Checklist</p>
         <h2 id="h-items">Os 28 itens do SEGRESS</h2>
         <div class="filters" id="filters" role="group" aria-label="Filtrar itens"></div>
-        <div class="row-head" aria-hidden="true"><span>Item</span><span>Descrição</span><span>Pontos</span><span>Avaliação</span></div>
         <div id="rows"></div>
-        <p class="foot">A avaliação mede a qualidade do <em>relato</em> segundo o SEGRESS, não a validade científica da revisão. Os autores do AMSTAR 2 desaconselham somar notas para a classificação geral; por isso a classificação vem da regra de falhas críticas, e o score serve para comparar artigos. Itens marcados "revisar" têm baixa confiança ou nota provisória por regra; confira-os e ajuste se necessário.</p>
+        <p class="foot">A avaliação mede a qualidade do <em>relato</em> segundo o SEGRESS, não a validade científica da revisão. Os autores do AMSTAR 2 desaconselham somar notas para a classificação geral; por isso ela vem da regra de falhas críticas, e o score serve para comparar artigos. Itens marcados "revisar" têm baixa confiança ou nota provisória por regra; confira-os e ajuste se necessário.</p>
       </section>
     </main>
   </div>
 </div>
 
 <script>
-// pdf.js: cdnjs primeiro, jsDelivr como reserva. O worker carregado como script roda no fio principal.
+// Bibliotecas por CDN (cdnjs primeiro, jsDelivr como reserva), carregadas só quando necessárias.
 function loadScript(src) { return new Promise((ok, fail) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail; document.head.append(s); }); }
-const PDFJS = [
-  ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'],
-  ['https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'],
-];
-let pdfReady = null;
+async function loadFirst(sets, check) {
+  for (const set of sets) { try { for (const u of set) await loadScript(u); if (check()) return; } catch (e) { /* tenta o próximo */ } }
+  throw new Error('Não foi possível carregar uma biblioteca necessária. Verifique a conexão e tente de novo.');
+}
+let pdfReady = null, pdfmakeReady = null;
 function ensurePdfJs() {
-  if (!pdfReady) pdfReady = (async () => {
-    for (const [lib, worker] of PDFJS) {
-      try {
-        await loadScript(lib); await loadScript(worker);
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
-        return window.pdfjsLib;
-      } catch (e) { /* tenta o próximo */ }
-    }
-    throw new Error('Não foi possível carregar o leitor de PDF.');
-  })();
-  return pdfReady;
+  return pdfReady ||= loadFirst([
+    ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'],
+    ['https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'],
+  ], () => !!window.pdfjsLib).then(() => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; return window.pdfjsLib; });
+}
+function ensurePdfMake() {
+  return pdfmakeReady ||= loadFirst([
+    ['https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js'],
+    ['https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js', 'https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js'],
+  ], () => !!(window.pdfMake && window.pdfMake.vfs)).then(() => window.pdfMake);
 }
 </script>
+
 <script>
 'use strict';
-const CL = {"items": [{"id": "opening", "title": "Abertura (Opening)", "section": "introducao", "critical": false}, {"id": "1", "title": "Título", "section": "titulo_resumo", "critical": false}, {"id": "2", "title": "Resumo estruturado", "section": "titulo_resumo", "critical": false}, {"id": "3", "title": "Justificativa (rationale)", "section": "introducao", "critical": false}, {"id": "4", "title": "Objetivos e questões de pesquisa", "section": "introducao", "critical": false}, {"id": "5", "title": "Critérios de elegibilidade", "section": "metodos", "critical": true}, {"id": "6", "title": "Fontes de informação", "section": "metodos", "critical": true}, {"id": "7", "title": "Estratégia de busca", "section": "metodos", "critical": true}, {"id": "8", "title": "Processo de seleção", "section": "metodos", "critical": true}, {"id": "9", "title": "Processo de coleta de dados", "section": "metodos", "critical": false}, {"id": "10", "title": "Itens de dados (10a, 10b)", "section": "metodos", "critical": false}, {"id": "11", "title": "Avaliação de risco de viés dos estudos", "section": "metodos", "critical": true}, {"id": "12", "title": "Medidas de efeito", "section": "metodos", "critical": false}, {"id": "13", "title": "Métodos de análise e síntese (13a a 13f)", "section": "metodos", "critical": true}, {"id": "14", "title": "Avaliação de viés de relato (publicação)", "section": "metodos", "critical": false}, {"id": "15", "title": "Avaliação de certeza da evidência", "section": "metodos", "critical": true}, {"id": "16", "title": "Seleção de estudos (16a, 16b)", "section": "resultados", "critical": true}, {"id": "17", "title": "Características dos estudos", "section": "resultados", "critical": false}, {"id": "18", "title": "Risco de viés nos estudos", "section": "resultados", "critical": false}, {"id": "19", "title": "Resultados dos estudos individuais", "section": "resultados", "critical": false}, {"id": "20", "title": "Resultados das análises e sínteses (20a a 20d)", "section": "resultados", "critical": false}, {"id": "21", "title": "Vieses de relato (resultados)", "section": "resultados", "critical": false}, {"id": "22", "title": "Certeza da evidência (resultados)", "section": "resultados", "critical": true}, {"id": "23", "title": "Discussão (23a a 23d)", "section": "discussao", "critical": true}, {"id": "24", "title": "Registro e protocolo (24a a 24c)", "section": "outras", "critical": false}, {"id": "25", "title": "Apoio e financiamento", "section": "outras", "critical": false}, {"id": "26", "title": "Conflitos de interesse", "section": "outras", "critical": false}, {"id": "27", "title": "Disponibilidade de dados, código e materiais", "section": "outras", "critical": false}], "checks": [{"code": "opening", "title": "Abertura: contexto, nicho e lacuna", "method": "L", "applies": "OOO", "sec": ["introduction"], "kw": ["problem", "important", "challenge", "however", "gap", "little is known", "context"], "q": "A introdução apresenta o problema maior, dá contexto amplo, mostra a importância do trabalho, define a área de pesquisa, estabelece um nicho (lacuna de conhecimento) e então foca nesse nicho?", "full": "Apresenta o problema e sua importância, define a área e explicita a lacuna (nicho) que a revisão ocupa.", "partial": "Contextualiza o tema, mas não explicita a lacuna ou a importância do trabalho.", "absent": "A introdução não contextualiza o problema nem a lacuna.", "item": "opening"}, {"code": "1", "title": "Título identifica o tipo de estudo", "applies": "OOO", "method": "R", "rule": "title_type", "sec": ["title"], "q": "O título identifica o relatório como revisão sistemática, mapeamento sistemático, estudo terciário, revisão qualitativa ou mista?", "full": "Identifica explicitamente o tipo de estudo secundário.", "partial": "Diz apenas revisão, survey ou levantamento, sem indicar que é sistemática.", "item": "1", "kw": [], "absent": "Não há informação sobre isso no artigo."}, {"code": "2", "title": "Resumo estruturado", "applies": "OOO", "method": "RL", "rule": "abstract_structured", "sec": ["abstract"], "kw": [], "q": "O resumo é estruturado e cobre contexto, objetivo, métodos, resultados e conclusão?", "full": "Cobre contexto, objetivo, métodos, resultados e conclusão.", "partial": "Cobre 2 ou 3 dessas partes, ou é um parágrafo corrido que menciona só algumas.", "item": "2", "absent": "Não há informação sobre isso no artigo."}, {"code": "3", "title": "Justificativa (rationale)", "applies": "OOO", "method": "L", "sec": ["introduction"], "kw": ["gap", "motivation", "rationale", "existing reviews", "previous reviews", "no systematic review", "update", "lack of"], "q": "A introdução justifica a revisão no contexto do conhecimento existente (lacuna, revisões anteriores, necessidade de atualizar ou de nova revisão)?", "full": "Explica a lacuna ou o motivo da revisão em relação ao que já existe.", "partial": "Descreve o tema e a importância, mas não a lacuna nem as revisões anteriores.", "item": "3", "absent": "Não há informação sobre isso no artigo."}, {"code": "4", "title": "Objetivos e questões de pesquisa", "applies": "OOO", "method": "RL", "rule": "research_questions", "sec": ["introduction", "methods"], "kw": ["research question", "RQ1", "objective", "aim of this"], "q": "Os objetivos ou questões de pesquisa estão explícitos e explicam como contribuem para o problema maior?", "full": "Questões de pesquisa ou objetivos explícitos e ligados ao problema.", "partial": "Há objetivo genérico, sem questões explícitas, ou questões sem ligação com o problema.", "item": "4", "absent": "Não há informação sobre isso no artigo."}, {"code": "5", "title": "Critérios de elegibilidade", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["inclusion criteria", "exclusion criteria", "inclusion", "exclusion", "language", "publication year", "period", "peer-reviewed", "grey literature"], "q": "Os critérios de inclusão e exclusão estão descritos e as restrições da busca (período, idioma, tipo de publicação) estão justificadas?", "full": "Critérios de inclusão e exclusão claros, e restrições de busca com justificativa.", "partial": "Critérios listados, mas sem justificar as restrições de busca (ou só inclusão, ou só exclusão).", "item": "5", "absent": "Não há informação sobre isso no artigo."}, {"code": "6", "title": "Fontes de informação e data da busca", "applies": "OOO", "method": "RL", "rule": "search_sources", "sec": ["methods"], "kw": ["Scopus", "IEEE Xplore", "ACM Digital Library", "Web of Science", "ScienceDirect", "Google Scholar", "databases", "search was conducted", "last search"], "q": "Os autores listam todas as fontes de busca (bases, registros, pesquisadores contatados) e a data da última busca em cada uma?", "full": "Lista as fontes e informa a data (ou mês/ano) da última busca de cada uma.", "partial": "Lista as fontes, mas não informa as datas, ou informa só para algumas.", "item": "6", "absent": "Não há informação sobre isso no artigo."}, {"code": "7", "title": "Estratégia de busca completa", "applies": "OOO", "method": "RL", "rule": "search_strings", "sec": ["methods"], "kw": ["search string", "search query", "AND", "OR", "keywords", "snowballing", "manual search", "pilot search", "gold standard"], "q": "A estratégia de busca completa está apresentada (strings de busca de cada base, snowballing, busca manual) de forma que possa ser repetida?", "full": "Strings completas (ou em apêndice referenciado) e demais métodos de busca descritos.", "partial": "Descreve termos ou a estratégia em linhas gerais, sem a string completa.", "item": "7", "absent": "Não há informação sobre isso no artigo."}, {"code": "8", "title": "Processo de seleção", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["reviewers", "authors independently", "screening", "selection", "disagreement", "kappa", "agreement", "consensus", "pilot", "tool"], "q": "O processo de seleção informa quantos revisores avaliaram cada estudo, se foram independentes, como resolveram discordâncias e a concordância medida?", "full": "Informa número de revisores, independência e tratamento de discordâncias (idealmente com concordância medida).", "partial": "Informa parte disso (por exemplo, só que dois autores selecionaram), sem independência ou discordâncias.", "item": "8", "absent": "Não há informação sobre isso no artigo."}, {"code": "9", "title": "Processo de coleta de dados", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["data extraction", "extracted", "extraction form", "independently", "cross-check", "validated", "contacted authors"], "q": "A coleta de dados informa quantos revisores extraíram dados de cada estudo, se foram independentes e como os dados foram conferidos ou confirmados?", "full": "Informa número de revisores, independência e conferência dos dados.", "partial": "Informa que houve extração (e talvez formulário), sem número de revisores nem conferência.", "item": "9", "absent": "Não há informação sobre isso no artigo."}, {"code": "10a", "title": "Desfechos (outcomes) buscados", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["outcome", "measure", "metric", "dependent variable", "effect"], "q": "Todos os desfechos para os quais se buscaram dados estão listados, definidos e ligados às questões de pesquisa?", "full": "Desfechos listados e definidos, com relação às questões de pesquisa.", "partial": "Desfechos citados sem definição ou sem relação com as questões.", "item": "10", "absent": "Não há informação sobre isso no artigo."}, {"code": "10b", "title": "Demais variáveis e classificação", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["data items", "extracted", "variables", "classification scheme", "attributes", "categories", "data extraction form", "assumptions"], "q": "As demais variáveis extraídas estão listadas e definidas (em mapeamentos, o esquema de classificação usado), incluindo suposições sobre dados ausentes?", "full": "Variáveis (ou esquema de classificação) listadas e definidas.", "partial": "Variáveis listadas sem definições, ou esquema citado sem as categorias.", "item": "10", "absent": "Não há informação sobre isso no artigo."}, {"code": "11", "title": "Avaliação de risco de viés / qualidade", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["quality assessment", "risk of bias", "critical appraisal", "quality criteria", "checklist", "appraisal", "quality score"], "q": "Os métodos de avaliação de risco de viés ou qualidade dos estudos incluídos estão descritos (ferramenta, critérios, número de revisores, independência)?", "full": "Ferramenta ou critérios descritos, com número de revisores e independência.", "partial": "Cita que avaliou qualidade ou usou uma ferramenta, sem detalhar critérios ou revisores.", "item": "11", "absent": "Não há informação sobre isso no artigo."}, {"code": "12", "title": "Medidas de efeito", "applies": "OP-", "method": "L", "sec": ["methods"], "kw": ["effect size", "effect measure", "standardized mean difference", "risk ratio", "correlation", "Cohen", "Hedges", "odds ratio"], "q": "A medida de efeito usada em cada desfecho está especificada?", "full": "Medida de efeito indicada para cada desfecho.", "partial": "Indica medida de efeito para alguns desfechos ou de forma genérica.", "item": "12", "absent": "Não há informação sobre isso no artigo."}, {"code": "13a", "title": "Elegibilidade para cada síntese", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["synthesis", "grouped", "subgroups", "eligible for", "categories", "group"], "q": "Descreve como se decidiu quais estudos eram elegíveis para cada síntese (agrupamentos)?", "full": "Explica como os estudos foram agrupados para cada síntese.", "partial": "Menciona agrupamentos sem explicar o critério.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13b", "title": "Preparação dos dados / codificação", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["missing data", "data conversion", "coding", "inductive", "deductive", "open coding", "codes", "imputation"], "q": "Descreve a preparação dos dados para síntese (dados faltantes, conversões) ou, em revisões qualitativas, o processo de codificação (indutivo ou dedutivo)?", "full": "Descreve o tratamento de dados faltantes/conversões ou a codificação e sua natureza.", "partial": "Menciona codificação ou tratamento de dados sem detalhar.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13c", "title": "Tabulação e visualização", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["table", "tables", "chart", "bubble plot", "forest plot", "visual", "map", "plot", "graph"], "q": "Descreve os métodos usados para tabular ou visualizar resultados dos estudos individuais e das sínteses?", "full": "Descreve como tabelas, gráficos ou mapas foram construídos.", "partial": "Menciona tabelas ou gráficos sem explicar como foram preparados.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13d", "title": "Métodos de síntese com justificativa", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["meta-analysis", "random effects", "fixed effect", "narrative synthesis", "thematic synthesis", "vote counting", "synthesis method", "R package", "software", "qualitative synthesis"], "q": "Os métodos de síntese estão descritos com justificativa da escolha (modelo, método de heterogeneidade, software; em qualitativas, constructos e validação)?", "full": "Método descrito e escolha justificada, com detalhes (modelo, software ou validação).", "partial": "Nomeia o método de síntese sem justificar ou sem detalhes.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13e", "title": "Análise de sensibilidade (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["sensitivity analysis", "robustness", "outlier", "deviant case", "exclude studies", "leave-one-out"], "q": "Descreve métodos de análise de sensibilidade (ou, em qualitativas, discussão do impacto de casos desviantes)?", "full": "Descreve o método de sensibilidade ou de casos desviantes.", "partial": "Menciona que fez sensibilidade, sem detalhar o método.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13f", "title": "Causas de heterogeneidade (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["heterogeneity", "I2", "Q test", "subgroup", "meta-regression", "moderator", "differences between studies"], "q": "Descreve métodos para explorar possíveis causas de heterogeneidade entre os resultados?", "full": "Descreve subgrupos, meta-regressão ou outro método.", "partial": "Menciona heterogeneidade sem dizer como foi explorada.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "14", "title": "Viés de publicação (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["publication bias", "funnel plot", "Egger", "file drawer", "trim and fill", "grey literature", "missing studies"], "q": "Descreve métodos para avaliar o risco de viés por resultados ausentes (viés de publicação)?", "full": "Descreve o método (funnel plot, testes, análise do rigor da busca).", "partial": "Cita viés de publicação sem dizer como foi avaliado.", "item": "14", "absent": "Não há informação sobre isso no artigo."}, {"code": "15", "title": "Certeza da evidência (método)", "applies": "O-O", "method": "RL", "rule": "certainty", "sec": ["methods"], "kw": ["GRADE", "CERQual", "certainty of evidence", "confidence in the evidence", "strength of evidence", "quality of evidence"], "q": "Descreve o método usado para avaliar a certeza (confiança) no corpo de evidência de cada desfecho (por exemplo GRADE ou GRADE-CERQual)?", "full": "Nomeia o método e explica como foi aplicado.", "partial": "Menciona avaliar a confiança na evidência, sem método ou sem explicar a aplicação.", "item": "15", "absent": "Não há informação sobre isso no artigo."}, {"code": "16a", "title": "Fluxo de seleção de estudos", "applies": "OOO", "method": "RL", "rule": "selection_flow", "sec": ["results", "methods"], "kw": ["flow diagram", "PRISMA", "selection process", "records", "papers", "studies were", "excluded", "after removing duplicates", "full text"], "q": "Os resultados da busca e seleção são apresentados, do número de registros identificados ao número de estudos incluídos, idealmente com diagrama de fluxo?", "full": "Números por etapa (identificados, triados, incluídos), idealmente em diagrama.", "partial": "Informa só o total inicial e o final, sem as etapas.", "item": "16", "absent": "Não há informação sobre isso no artigo."}, {"code": "16b", "title": "Estudos quase incluídos", "applies": "OPO", "method": "L", "sec": ["results"], "kw": ["excluded", "near miss", "borderline", "full text", "reasons for exclusion", "exclusion reasons"], "q": "Cita estudos que atenderam a muitos critérios mas foram excluídos e explica por quê?", "full": "Lista os estudos quase incluídos com o motivo da exclusão.", "partial": "Informa motivos de exclusão agregados, sem citar os estudos.", "item": "16", "absent": "Não há informação sobre isso no artigo."}, {"code": "17", "title": "Características dos estudos incluídos", "applies": "OOO", "method": "L", "sec": ["results"], "kw": ["Table", "primary studies", "selected studies", "characteristics", "included studies", "appendix", "list of studies"], "q": "Cita cada estudo incluído e apresenta suas características?", "full": "Cada estudo incluído citado, com características apresentadas.", "partial": "Apresenta características agregadas, ou lista os estudos sem suas características.", "item": "17", "absent": "Não há informação sobre isso no artigo."}, {"code": "18", "title": "Risco de viés por estudo", "applies": "OPO", "method": "L", "sec": ["results"], "kw": ["quality assessment results", "risk of bias", "quality scores", "appraisal results", "quality of the primary studies"], "q": "Apresenta a avaliação de risco de viés ou qualidade de cada estudo incluído (e a concordância entre avaliadores)?", "full": "Avaliação por estudo apresentada (tabela ou apêndice).", "partial": "Apresenta só resultados agregados da avaliação de qualidade.", "item": "18", "absent": "Não há informação sobre isso no artigo."}, {"code": "19", "title": "Resultados dos estudos individuais", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["results of individual studies", "effect size", "confidence interval", "mean", "per study", "findings of each", "major findings"], "q": "Apresenta, para cada desfecho e estudo, estatísticas (ou, em qualitativas, os principais achados de cada estudo)?", "full": "Resultados por estudo apresentados em tabela ou gráfico.", "partial": "Apresenta resultados só de parte dos estudos ou só agregados.", "item": "19", "absent": "Não há informação sobre isso no artigo."}, {"code": "20a", "title": "Resumo de cada síntese", "applies": "OOO", "method": "L", "sec": ["results"], "kw": ["results", "findings", "RQ1", "answer to", "summary of", "themes"], "q": "Resume as características e o risco de viés dos estudos que contribuem para cada síntese (em mapeamentos, discute mapas e tabelas que respondem a cada questão)?", "full": "Cada síntese (ou questão) tem resumo com características e riscos dos estudos contribuintes.", "partial": "Apresenta resultados por questão sem tratar do risco de viés ou das características dos estudos.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20b", "title": "Resultados estatísticos das sínteses", "applies": "O--", "method": "L", "sec": ["results"], "kw": ["pooled", "overall effect", "confidence interval", "I2", "heterogeneity", "forest plot", "summary estimate"], "q": "Apresenta resultados das sínteses estatísticas (estimativa resumo com precisão e medidas de heterogeneidade)?", "full": "Estimativa resumo com intervalo de confiança e heterogeneidade.", "partial": "Apresenta estimativas sem precisão ou sem heterogeneidade.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20c", "title": "Resultados das análises de sensibilidade", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["sensitivity analysis", "robust", "removing", "leave-one-out", "deviant cases"], "q": "Apresenta resultados das análises de sensibilidade (ou, em qualitativas, casos desviantes)?", "full": "Resultados apresentados.", "partial": "Menciona que a análise foi feita sem mostrar resultados.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20d", "title": "Resultados sobre causas de heterogeneidade", "applies": "O-P", "method": "L", "sec": ["results"], "kw": ["heterogeneity", "moderator", "subgroup analysis", "explain differences", "contextual factors"], "q": "Apresenta resultados das investigações de causas de heterogeneidade (ou fatores que expliquem diferenças entre estudos)?", "full": "Resultados apresentados.", "partial": "Cita heterogeneidade sem resultados da investigação.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "21", "title": "Viés de publicação (resultados)", "applies": "O--", "method": "L", "sec": ["results"], "kw": ["publication bias", "funnel plot", "Egger", "small-study effects"], "q": "Apresenta os resultados da avaliação de viés de publicação para cada síntese?", "full": "Resultados apresentados (por exemplo funnel plot).", "partial": "Comenta o risco de viés de publicação sem resultado da avaliação.", "item": "21", "absent": "Não há informação sobre isso no artigo."}, {"code": "22", "title": "Certeza da evidência por desfecho", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["GRADE", "certainty", "confidence in the evidence", "strength of evidence", "CERQual", "low certainty", "high certainty"], "q": "Apresenta a avaliação de certeza (confiança) no corpo de evidência de cada desfecho?", "full": "Certeza apresentada por desfecho.", "partial": "Comenta a força da evidência de forma geral, sem avaliação por desfecho.", "item": "22", "absent": "Não há informação sobre isso no artigo."}, {"code": "23a", "title": "Interpretação geral", "applies": "OOO", "method": "L", "sec": ["discussion"], "kw": ["compared with", "in line with", "consistent with", "previous reviews", "contrary to", "interpretation"], "q": "A discussão interpreta os resultados no contexto de outras evidências (outras revisões sobre o mesmo tema)?", "full": "Interpretação com comparação a outras revisões ou evidências.", "partial": "Interpreta os resultados sem compará-los a outros trabalhos.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23b", "title": "Limitações da evidência incluída", "applies": "O-O", "method": "L", "sec": ["discussion"], "kw": ["limitations of the primary studies", "quality of primary studies", "threats to validity", "small samples", "risk of bias", "applicability"], "q": "Discute limitações da evidência incluída (completude, aplicabilidade, incertezas, risco de viés dos estudos primários)?", "full": "Discute limitações dos estudos primários e seu efeito nas conclusões.", "partial": "Menciona limitações da evidência de forma genérica.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23c", "title": "Limitações do processo da revisão", "applies": "OOO", "method": "L", "sec": ["discussion", "methods"], "kw": ["threats to validity", "limitations", "bias", "single reviewer", "language", "search limited", "incomplete", "mitigation"], "q": "Discute limitações do processo da revisão (apenas questões não tratadas antes nos Métodos) e seu efeito possível nos resultados?", "full": "Discute limitações do processo e o possível impacto nos achados.", "partial": "Lista limitações do processo sem discutir o impacto.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23d", "title": "Implicações para prática, política e pesquisa", "applies": "OOO", "method": "L", "sec": ["discussion"], "kw": ["implications", "practitioners", "researchers", "future research", "recommendations", "future work", "research agenda"], "q": "Discute implicações dos resultados para prática, política e pesquisa futura (em mapeamentos basta pesquisa futura)?", "full": "Implicações claras e ligadas aos resultados.", "partial": "Cita implicações ou trabalhos futuros de forma genérica.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "24a", "title": "Registro da revisão", "applies": "PPP", "method": "RL", "rule": "registration", "sec": ["methods", "abstract"], "kw": ["registered", "registration", "PROSPERO", "OSF", "protocol"], "q": "Informa onde a revisão foi registrada (nome do registro e número) ou declara que não foi registrada?", "full": "Registro com nome e número, ou declaração de não registro.", "partial": "Menciona protocolo ou registro sem os dados do registro.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "24b", "title": "Acesso ao protocolo", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["protocol", "review protocol", "pre-defined", "available at", "publicly available"], "q": "Indica onde o protocolo pode ser acessado ou declara que não houve protocolo?", "full": "Indica onde o protocolo está ou declara que não existe.", "partial": "Diz que seguiu um protocolo, sem indicar onde acessá-lo.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "24c", "title": "Emendas ao protocolo", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["deviation", "amendment", "changes to the protocol", "changed from protocol", "protocol deviations", "adapted"], "q": "Descreve e explica alterações em relação ao registro ou protocolo (ou declara que não houve)?", "full": "Descreve e justifica as alterações (ou declara que não houve).", "partial": "Menciona desvios sem explicar.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "25", "title": "Financiamento e apoio", "applies": "OOO", "method": "RL", "rule": "funding", "sec": ["acknowledgments", "back"], "kw": ["funded by", "funding", "financial support", "grant", "sponsor", "supported by", "no funding"], "q": "Descreve fontes de apoio financeiro e não financeiro e o papel dos financiadores (ou declara que não houve)?", "full": "Fontes e papel dos financiadores (ou declaração de ausência).", "partial": "Cita agradecimento ou apoio sem detalhar a fonte ou o papel.", "item": "25", "absent": "Não há informação sobre isso no artigo."}, {"code": "26", "title": "Conflitos de interesse", "applies": "OOO", "method": "RL", "rule": "coi", "sec": ["acknowledgments", "back"], "kw": ["conflict of interest", "competing interests", "declare"], "q": "Declara os conflitos de interesse dos autores (ou a ausência deles)?", "full": "Declaração presente.", "partial": "Menção vaga, sem declaração clara.", "item": "26", "absent": "Não há informação sobre isso no artigo."}, {"code": "27", "title": "Disponibilidade de dados, código e materiais", "applies": "PPP", "method": "R", "rule": "data_availability", "sec": ["back", "methods"], "kw": ["Zenodo", "Figshare", "GitHub", "replication package", "supplementary material", "data availability"], "q": "Informa quais materiais (formulários, dados extraídos, código) estão públicos e onde?", "full": "Repositório público citado.", "partial": "Diz que há material suplementar ou dados sob demanda, sem repositório.", "item": "27", "absent": "Não há informação sobre isso no artigo."}]};
+const CL = {"items": [{"id": "opening", "title": "Abertura (Opening)", "section": "introducao", "critical": false, "recommend": "Abra a Introdução com o problema maior e sua importância, defina a área de pesquisa, estabeleça o nicho (a lacuna de conhecimento) e então foque nele.", "ref": ""}, {"id": "1", "title": "Título", "section": "titulo_resumo", "critical": false, "recommend": "Inclua no título o tipo de estudo (revisão sistemática, mapeamento sistemático, estudo terciário, revisão qualitativa ou de métodos mistos) e o tema revisado.", "ref": "2.1"}, {"id": "2", "title": "Resumo estruturado", "section": "titulo_resumo", "critical": false, "recommend": "Estruture o resumo em Contexto (com a importância da pesquisa), Objetivo, Métodos, Resultados, Limitações (opcional) e Conclusão.", "ref": "2.2"}, {"id": "3", "title": "Justificativa (rationale)", "section": "introducao", "critical": false, "recommend": "Explique por que a revisão é necessária (atualização, tema novo, novos resultados empíricos ou tema maduro sem revisão anterior) e como ela contribui para o problema maior.", "ref": "2.3"}, {"id": "4", "title": "Objetivos e questões de pesquisa", "section": "introducao", "critical": false, "recommend": "Liste as questões de pesquisa e explique como cada uma contribui para o problema maior.", "ref": "2.4"}, {"id": "5", "title": "Critérios de elegibilidade", "section": "metodos", "critical": true, "recommend": "Especifique os critérios de inclusão e exclusão a partir das características dos estudos e justifique as restrições da busca (datas de início e fim, idioma, periódicos, tipo de publicação). Diga como as revisões existentes encontradas na busca serão usadas.", "ref": "3.1"}, {"id": "6", "title": "Fontes de informação", "section": "metodos", "critical": true, "recommend": "Liste todas as fontes consultadas (bases, referências de estudos primários, pesquisadores contatados) com a data final da busca em cada uma. Use o checklist baseado no PRISMA-S do Material Suplementar.", "ref": "3.4"}, {"id": "7", "title": "Estratégia de busca", "section": "metodos", "critical": true, "recommend": "Apresente a estratégia completa: a string de busca de cada base, snowballing, busca manual, busca de literatura não publicada e como a completude foi avaliada. Se houver revisões anteriores, diga como contribuíram para a busca.", "ref": "3.5"}, {"id": "8", "title": "Processo de seleção", "section": "metodos", "critical": true, "recommend": "Descreva as fases da seleção, quantos avaliadores analisaram cada estudo, como as discordâncias foram resolvidas, as ferramentas usadas e a concordância medida (por exemplo, kappa).", "ref": "3.6"}, {"id": "9", "title": "Processo de coleta de dados", "section": "metodos", "critical": false, "recommend": "Diga quantos revisores extraíram os dados de cada estudo, se trabalharam de forma independente, como os dados foram conferidos ou confirmados com os autores e quais ferramentas foram usadas.", "ref": "3.7"}, {"id": "10", "title": "Itens de dados (10a, 10b)", "section": "metodos", "critical": false, "recommend": "Liste e defina os desfechos buscados e sua relação com as questões de pesquisa (10a, exceto em mapeamentos) e as demais variáveis extraídas, incluindo o esquema de classificação e as suposições sobre dados ausentes (10b).", "ref": "3.8 e 3.9"}, {"id": "11", "title": "Avaliação de risco de viés dos estudos", "section": "metodos", "critical": true, "recommend": "Descreva como o risco de viés (qualidade) dos estudos foi avaliado: instrumento ou critérios, quantos avaliadores por estudo e se trabalharam de forma independente.", "ref": "3.10"}, {"id": "12", "title": "Medidas de efeito", "section": "metodos", "critical": false, "recommend": "Para cada desfecho, especifique a medida de efeito usada na síntese (por exemplo, diferença de médias padronizada ou razão de risco).", "ref": "3.11"}, {"id": "13", "title": "Métodos de análise e síntese (13a a 13f)", "section": "metodos", "critical": true, "recommend": "Descreva como os estudos foram agrupados em cada síntese (13a), a preparação dos dados ou a codificação (13b), as tabelas e gráficos (13c), o método de síntese com justificativa (13d), a análise de sensibilidade (13e) e a exploração da heterogeneidade (13f), conforme o tipo de estudo.", "ref": "3.12 a 3.18"}, {"id": "14", "title": "Avaliação de viés de relato (publicação)", "section": "metodos", "critical": false, "recommend": "Descreva como foi avaliado o risco de viés por resultados ausentes (viés de publicação), por exemplo pelo rigor da busca ou, em meta-análises, por funnel plot.", "ref": "3.19"}, {"id": "15", "title": "Avaliação de certeza da evidência", "section": "metodos", "critical": true, "recommend": "Descreva o método usado para avaliar a certeza (confiança) no corpo de evidência de cada desfecho, como GRADE ou GRADE-CERQual.", "ref": "3.20"}, {"id": "16", "title": "Seleção de estudos (16a, 16b)", "section": "resultados", "critical": true, "recommend": "Relate o número de registros em cada etapa, da busca à inclusão, de preferência com diagrama de fluxo e estatísticas de concordância (16a). Cite os estudos quase incluídos e o motivo da exclusão (16b).", "ref": "4.1 e 4.2"}, {"id": "17", "title": "Características dos estudos", "section": "resultados", "critical": false, "recommend": "Cite cada estudo incluído e apresente suas características, de preferência em tabela.", "ref": "4.3"}, {"id": "18", "title": "Risco de viés nos estudos", "section": "resultados", "critical": false, "recommend": "Apresente a avaliação de risco de viés (qualidade) de cada estudo incluído e a concordância entre os avaliadores.", "ref": "4.4"}, {"id": "19", "title": "Resultados dos estudos individuais", "section": "resultados", "critical": false, "recommend": "Para cada estudo, apresente as estatísticas por grupo e a estimativa de efeito com sua precisão (em revisões qualitativas, os principais achados), de preferência em tabelas ou gráficos.", "ref": "4.5"}, {"id": "20", "title": "Resultados das análises e sínteses (20a a 20d)", "section": "resultados", "critical": false, "recommend": "Para cada síntese ou questão de pesquisa, resuma as características e o risco de viés dos estudos que contribuem (20a) e apresente as estimativas com intervalo e heterogeneidade (20b), a sensibilidade ou os casos desviantes (20c) e as causas de heterogeneidade (20d), conforme o tipo de estudo.", "ref": "4.6 a 4.10"}, {"id": "21", "title": "Vieses de relato (resultados)", "section": "resultados", "critical": false, "recommend": "Apresente a avaliação de viés de publicação de cada síntese; em meta-análises, a heterogeneidade entre estudos e o funnel plot.", "ref": "4.11"}, {"id": "22", "title": "Certeza da evidência (resultados)", "section": "resultados", "critical": true, "recommend": "Para cada achado, apresente a certeza (confiança) da evidência, por exemplo numa tabela de resumo de achados com o nível GRADE ou CERQual.", "ref": "4.12"}, {"id": "23", "title": "Discussão (23a a 23d)", "section": "discussao", "critical": true, "recommend": "Interprete os resultados frente a outras revisões (23a) e discuta as limitações da evidência (23b), as limitações do processo ainda não tratadas nos Métodos (23c) e as implicações para prática, política e pesquisa futura (23d).", "ref": "5.2 a 5.5"}, {"id": "24", "title": "Registro e protocolo (24a a 24c)", "section": "outras", "critical": false, "recommend": "Informe o registro da revisão com nome e número, ou que ela não foi registrada (24a), onde o protocolo pode ser acessado (24b) e as alterações feitas em relação a ele, com justificativa (24c).", "ref": "6.2 a 6.4"}, {"id": "25", "title": "Apoio e financiamento", "section": "outras", "critical": false, "recommend": "Declare as fontes de apoio financeiro e não financeiro e o papel dos financiadores, ou que não houve financiamento.", "ref": "6.5"}, {"id": "26", "title": "Conflitos de interesse", "section": "outras", "critical": false, "recommend": "Declare os conflitos de interesse dos autores ou a ausência deles.", "ref": "6.6"}, {"id": "27", "title": "Disponibilidade de dados, código e materiais", "section": "outras", "critical": false, "recommend": "Disponibilize em repositório público (Zenodo, Figshare, OSF) os formulários de extração, os dados extraídos, os dados das análises e o código, e diga onde estão.", "ref": "6.7"}], "checks": [{"code": "opening", "title": "Abertura: contexto, nicho e lacuna", "method": "L", "applies": "OOO", "sec": ["introduction"], "kw": ["problem", "important", "challenge", "however", "gap", "little is known", "context"], "q": "A introdução apresenta o problema maior, dá contexto amplo, mostra a importância do trabalho, define a área de pesquisa, estabelece um nicho (lacuna de conhecimento) e então foca nesse nicho?", "full": "Apresenta o problema e sua importância, define a área e explicita a lacuna (nicho) que a revisão ocupa.", "partial": "Contextualiza o tema, mas não explicita a lacuna ou a importância do trabalho.", "absent": "A introdução não contextualiza o problema nem a lacuna.", "item": "opening"}, {"code": "1", "title": "Título identifica o tipo de estudo", "applies": "OOO", "method": "R", "rule": "title_type", "sec": ["title"], "q": "O título identifica o relatório como revisão sistemática, mapeamento sistemático, estudo terciário, revisão qualitativa ou mista?", "full": "Identifica explicitamente o tipo de estudo secundário.", "partial": "Diz apenas revisão, survey ou levantamento, sem indicar que é sistemática.", "item": "1", "kw": [], "absent": "Não há informação sobre isso no artigo."}, {"code": "2", "title": "Resumo estruturado", "applies": "OOO", "method": "RL", "rule": "abstract_structured", "sec": ["abstract"], "kw": [], "q": "O resumo é estruturado e cobre contexto, objetivo, métodos, resultados e conclusão?", "full": "Cobre contexto, objetivo, métodos, resultados e conclusão.", "partial": "Cobre 2 ou 3 dessas partes, ou é um parágrafo corrido que menciona só algumas.", "item": "2", "absent": "Não há informação sobre isso no artigo."}, {"code": "3", "title": "Justificativa (rationale)", "applies": "OOO", "method": "L", "sec": ["introduction"], "kw": ["gap", "motivation", "rationale", "existing reviews", "previous reviews", "no systematic review", "update", "lack of"], "q": "A introdução justifica a revisão no contexto do conhecimento existente (lacuna, revisões anteriores, necessidade de atualizar ou de nova revisão)?", "full": "Explica a lacuna ou o motivo da revisão em relação ao que já existe.", "partial": "Descreve o tema e a importância, mas não a lacuna nem as revisões anteriores.", "item": "3", "absent": "Não há informação sobre isso no artigo."}, {"code": "4", "title": "Objetivos e questões de pesquisa", "applies": "OOO", "method": "RL", "rule": "research_questions", "sec": ["introduction", "methods"], "kw": ["research question", "RQ1", "objective", "aim of this"], "q": "Os objetivos ou questões de pesquisa estão explícitos e explicam como contribuem para o problema maior?", "full": "Questões de pesquisa ou objetivos explícitos e ligados ao problema.", "partial": "Há objetivo genérico, sem questões explícitas, ou questões sem ligação com o problema.", "item": "4", "absent": "Não há informação sobre isso no artigo."}, {"code": "5", "title": "Critérios de elegibilidade", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["inclusion criteria", "exclusion criteria", "inclusion", "exclusion", "language", "publication year", "period", "peer-reviewed", "grey literature"], "q": "Os critérios de inclusão e exclusão estão descritos e as restrições da busca (período, idioma, tipo de publicação) estão justificadas?", "full": "Critérios de inclusão e exclusão claros, e restrições de busca com justificativa.", "partial": "Critérios listados, mas sem justificar as restrições de busca (ou só inclusão, ou só exclusão).", "item": "5", "absent": "Não há informação sobre isso no artigo."}, {"code": "6", "title": "Fontes de informação e data da busca", "applies": "OOO", "method": "RL", "rule": "search_sources", "sec": ["methods"], "kw": ["Scopus", "IEEE Xplore", "ACM Digital Library", "Web of Science", "ScienceDirect", "Google Scholar", "databases", "search was conducted", "last search"], "q": "Os autores listam todas as fontes de busca (bases, registros, pesquisadores contatados) e a data da última busca em cada uma?", "full": "Lista as fontes e informa a data (ou mês/ano) da última busca de cada uma.", "partial": "Lista as fontes, mas não informa as datas, ou informa só para algumas.", "item": "6", "absent": "Não há informação sobre isso no artigo."}, {"code": "7", "title": "Estratégia de busca completa", "applies": "OOO", "method": "RL", "rule": "search_strings", "sec": ["methods"], "kw": ["search string", "search query", "AND", "OR", "keywords", "snowballing", "manual search", "pilot search", "gold standard"], "q": "A estratégia de busca completa está apresentada (strings de busca de cada base, snowballing, busca manual) de forma que possa ser repetida?", "full": "Strings completas (ou em apêndice referenciado) e demais métodos de busca descritos.", "partial": "Descreve termos ou a estratégia em linhas gerais, sem a string completa.", "item": "7", "absent": "Não há informação sobre isso no artigo."}, {"code": "8", "title": "Processo de seleção", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["reviewers", "authors independently", "screening", "selection", "disagreement", "kappa", "agreement", "consensus", "pilot", "tool"], "q": "O processo de seleção informa quantos revisores avaliaram cada estudo, se foram independentes, como resolveram discordâncias e a concordância medida?", "full": "Informa número de revisores, independência e tratamento de discordâncias (idealmente com concordância medida).", "partial": "Informa parte disso (por exemplo, só que dois autores selecionaram), sem independência ou discordâncias.", "item": "8", "absent": "Não há informação sobre isso no artigo."}, {"code": "9", "title": "Processo de coleta de dados", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["data extraction", "extracted", "extraction form", "independently", "cross-check", "validated", "contacted authors"], "q": "A coleta de dados informa quantos revisores extraíram dados de cada estudo, se foram independentes e como os dados foram conferidos ou confirmados?", "full": "Informa número de revisores, independência e conferência dos dados.", "partial": "Informa que houve extração (e talvez formulário), sem número de revisores nem conferência.", "item": "9", "absent": "Não há informação sobre isso no artigo."}, {"code": "10a", "title": "Desfechos (outcomes) buscados", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["outcome", "measure", "metric", "dependent variable", "effect"], "q": "Todos os desfechos para os quais se buscaram dados estão listados, definidos e ligados às questões de pesquisa?", "full": "Desfechos listados e definidos, com relação às questões de pesquisa.", "partial": "Desfechos citados sem definição ou sem relação com as questões.", "item": "10", "absent": "Não há informação sobre isso no artigo."}, {"code": "10b", "title": "Demais variáveis e classificação", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["data items", "extracted", "variables", "classification scheme", "attributes", "categories", "data extraction form", "assumptions"], "q": "As demais variáveis extraídas estão listadas e definidas (em mapeamentos, o esquema de classificação usado), incluindo suposições sobre dados ausentes?", "full": "Variáveis (ou esquema de classificação) listadas e definidas.", "partial": "Variáveis listadas sem definições, ou esquema citado sem as categorias.", "item": "10", "absent": "Não há informação sobre isso no artigo."}, {"code": "11", "title": "Avaliação de risco de viés / qualidade", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["quality assessment", "risk of bias", "critical appraisal", "quality criteria", "checklist", "appraisal", "quality score"], "q": "Os métodos de avaliação de risco de viés ou qualidade dos estudos incluídos estão descritos (ferramenta, critérios, número de revisores, independência)?", "full": "Ferramenta ou critérios descritos, com número de revisores e independência.", "partial": "Cita que avaliou qualidade ou usou uma ferramenta, sem detalhar critérios ou revisores.", "item": "11", "absent": "Não há informação sobre isso no artigo."}, {"code": "12", "title": "Medidas de efeito", "applies": "OP-", "method": "L", "sec": ["methods"], "kw": ["effect size", "effect measure", "standardized mean difference", "risk ratio", "correlation", "Cohen", "Hedges", "odds ratio"], "q": "A medida de efeito usada em cada desfecho está especificada?", "full": "Medida de efeito indicada para cada desfecho.", "partial": "Indica medida de efeito para alguns desfechos ou de forma genérica.", "item": "12", "absent": "Não há informação sobre isso no artigo."}, {"code": "13a", "title": "Elegibilidade para cada síntese", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["synthesis", "grouped", "subgroups", "eligible for", "categories", "group"], "q": "Descreve como se decidiu quais estudos eram elegíveis para cada síntese (agrupamentos)?", "full": "Explica como os estudos foram agrupados para cada síntese.", "partial": "Menciona agrupamentos sem explicar o critério.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13b", "title": "Preparação dos dados / codificação", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["missing data", "data conversion", "coding", "inductive", "deductive", "open coding", "codes", "imputation"], "q": "Descreve a preparação dos dados para síntese (dados faltantes, conversões) ou, em revisões qualitativas, o processo de codificação (indutivo ou dedutivo)?", "full": "Descreve o tratamento de dados faltantes/conversões ou a codificação e sua natureza.", "partial": "Menciona codificação ou tratamento de dados sem detalhar.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13c", "title": "Tabulação e visualização", "applies": "OOO", "method": "L", "sec": ["methods"], "kw": ["table", "tables", "chart", "bubble plot", "forest plot", "visual", "map", "plot", "graph"], "q": "Descreve os métodos usados para tabular ou visualizar resultados dos estudos individuais e das sínteses?", "full": "Descreve como tabelas, gráficos ou mapas foram construídos.", "partial": "Menciona tabelas ou gráficos sem explicar como foram preparados.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13d", "title": "Métodos de síntese com justificativa", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["meta-analysis", "random effects", "fixed effect", "narrative synthesis", "thematic synthesis", "vote counting", "synthesis method", "R package", "software", "qualitative synthesis"], "q": "Os métodos de síntese estão descritos com justificativa da escolha (modelo, método de heterogeneidade, software; em qualitativas, constructos e validação)?", "full": "Método descrito e escolha justificada, com detalhes (modelo, software ou validação).", "partial": "Nomeia o método de síntese sem justificar ou sem detalhes.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13e", "title": "Análise de sensibilidade (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["sensitivity analysis", "robustness", "outlier", "deviant case", "exclude studies", "leave-one-out"], "q": "Descreve métodos de análise de sensibilidade (ou, em qualitativas, discussão do impacto de casos desviantes)?", "full": "Descreve o método de sensibilidade ou de casos desviantes.", "partial": "Menciona que fez sensibilidade, sem detalhar o método.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "13f", "title": "Causas de heterogeneidade (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["heterogeneity", "I2", "Q test", "subgroup", "meta-regression", "moderator", "differences between studies"], "q": "Descreve métodos para explorar possíveis causas de heterogeneidade entre os resultados?", "full": "Descreve subgrupos, meta-regressão ou outro método.", "partial": "Menciona heterogeneidade sem dizer como foi explorada.", "item": "13", "absent": "Não há informação sobre isso no artigo."}, {"code": "14", "title": "Viés de publicação (método)", "applies": "O-O", "method": "L", "sec": ["methods"], "kw": ["publication bias", "funnel plot", "Egger", "file drawer", "trim and fill", "grey literature", "missing studies"], "q": "Descreve métodos para avaliar o risco de viés por resultados ausentes (viés de publicação)?", "full": "Descreve o método (funnel plot, testes, análise do rigor da busca).", "partial": "Cita viés de publicação sem dizer como foi avaliado.", "item": "14", "absent": "Não há informação sobre isso no artigo."}, {"code": "15", "title": "Certeza da evidência (método)", "applies": "O-O", "method": "RL", "rule": "certainty", "sec": ["methods"], "kw": ["GRADE", "CERQual", "certainty of evidence", "confidence in the evidence", "strength of evidence", "quality of evidence"], "q": "Descreve o método usado para avaliar a certeza (confiança) no corpo de evidência de cada desfecho (por exemplo GRADE ou GRADE-CERQual)?", "full": "Nomeia o método e explica como foi aplicado.", "partial": "Menciona avaliar a confiança na evidência, sem método ou sem explicar a aplicação.", "item": "15", "absent": "Não há informação sobre isso no artigo."}, {"code": "16a", "title": "Fluxo de seleção de estudos", "applies": "OOO", "method": "RL", "rule": "selection_flow", "sec": ["results", "methods"], "kw": ["flow diagram", "PRISMA", "selection process", "records", "papers", "studies were", "excluded", "after removing duplicates", "full text"], "q": "Os resultados da busca e seleção são apresentados, do número de registros identificados ao número de estudos incluídos, idealmente com diagrama de fluxo?", "full": "Números por etapa (identificados, triados, incluídos), idealmente em diagrama.", "partial": "Informa só o total inicial e o final, sem as etapas.", "item": "16", "absent": "Não há informação sobre isso no artigo."}, {"code": "16b", "title": "Estudos quase incluídos", "applies": "OPO", "method": "L", "sec": ["results"], "kw": ["excluded", "near miss", "borderline", "full text", "reasons for exclusion", "exclusion reasons"], "q": "Cita estudos que atenderam a muitos critérios mas foram excluídos e explica por quê?", "full": "Lista os estudos quase incluídos com o motivo da exclusão.", "partial": "Informa motivos de exclusão agregados, sem citar os estudos.", "item": "16", "absent": "Não há informação sobre isso no artigo."}, {"code": "17", "title": "Características dos estudos incluídos", "applies": "OOO", "method": "L", "sec": ["results"], "kw": ["Table", "primary studies", "selected studies", "characteristics", "included studies", "appendix", "list of studies"], "q": "Cita cada estudo incluído e apresenta suas características?", "full": "Cada estudo incluído citado, com características apresentadas.", "partial": "Apresenta características agregadas, ou lista os estudos sem suas características.", "item": "17", "absent": "Não há informação sobre isso no artigo."}, {"code": "18", "title": "Risco de viés por estudo", "applies": "OPO", "method": "L", "sec": ["results"], "kw": ["quality assessment results", "risk of bias", "quality scores", "appraisal results", "quality of the primary studies"], "q": "Apresenta a avaliação de risco de viés ou qualidade de cada estudo incluído (e a concordância entre avaliadores)?", "full": "Avaliação por estudo apresentada (tabela ou apêndice).", "partial": "Apresenta só resultados agregados da avaliação de qualidade.", "item": "18", "absent": "Não há informação sobre isso no artigo."}, {"code": "19", "title": "Resultados dos estudos individuais", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["results of individual studies", "effect size", "confidence interval", "mean", "per study", "findings of each", "major findings"], "q": "Apresenta, para cada desfecho e estudo, estatísticas (ou, em qualitativas, os principais achados de cada estudo)?", "full": "Resultados por estudo apresentados em tabela ou gráfico.", "partial": "Apresenta resultados só de parte dos estudos ou só agregados.", "item": "19", "absent": "Não há informação sobre isso no artigo."}, {"code": "20a", "title": "Resumo de cada síntese", "applies": "OOO", "method": "L", "sec": ["results"], "kw": ["results", "findings", "RQ1", "answer to", "summary of", "themes"], "q": "Resume as características e o risco de viés dos estudos que contribuem para cada síntese (em mapeamentos, discute mapas e tabelas que respondem a cada questão)?", "full": "Cada síntese (ou questão) tem resumo com características e riscos dos estudos contribuintes.", "partial": "Apresenta resultados por questão sem tratar do risco de viés ou das características dos estudos.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20b", "title": "Resultados estatísticos das sínteses", "applies": "O--", "method": "L", "sec": ["results"], "kw": ["pooled", "overall effect", "confidence interval", "I2", "heterogeneity", "forest plot", "summary estimate"], "q": "Apresenta resultados das sínteses estatísticas (estimativa resumo com precisão e medidas de heterogeneidade)?", "full": "Estimativa resumo com intervalo de confiança e heterogeneidade.", "partial": "Apresenta estimativas sem precisão ou sem heterogeneidade.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20c", "title": "Resultados das análises de sensibilidade", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["sensitivity analysis", "robust", "removing", "leave-one-out", "deviant cases"], "q": "Apresenta resultados das análises de sensibilidade (ou, em qualitativas, casos desviantes)?", "full": "Resultados apresentados.", "partial": "Menciona que a análise foi feita sem mostrar resultados.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "20d", "title": "Resultados sobre causas de heterogeneidade", "applies": "O-P", "method": "L", "sec": ["results"], "kw": ["heterogeneity", "moderator", "subgroup analysis", "explain differences", "contextual factors"], "q": "Apresenta resultados das investigações de causas de heterogeneidade (ou fatores que expliquem diferenças entre estudos)?", "full": "Resultados apresentados.", "partial": "Cita heterogeneidade sem resultados da investigação.", "item": "20", "absent": "Não há informação sobre isso no artigo."}, {"code": "21", "title": "Viés de publicação (resultados)", "applies": "O--", "method": "L", "sec": ["results"], "kw": ["publication bias", "funnel plot", "Egger", "small-study effects"], "q": "Apresenta os resultados da avaliação de viés de publicação para cada síntese?", "full": "Resultados apresentados (por exemplo funnel plot).", "partial": "Comenta o risco de viés de publicação sem resultado da avaliação.", "item": "21", "absent": "Não há informação sobre isso no artigo."}, {"code": "22", "title": "Certeza da evidência por desfecho", "applies": "O-O", "method": "L", "sec": ["results"], "kw": ["GRADE", "certainty", "confidence in the evidence", "strength of evidence", "CERQual", "low certainty", "high certainty"], "q": "Apresenta a avaliação de certeza (confiança) no corpo de evidência de cada desfecho?", "full": "Certeza apresentada por desfecho.", "partial": "Comenta a força da evidência de forma geral, sem avaliação por desfecho.", "item": "22", "absent": "Não há informação sobre isso no artigo."}, {"code": "23a", "title": "Interpretação geral", "applies": "OOO", "method": "L", "sec": ["discussion"], "kw": ["compared with", "in line with", "consistent with", "previous reviews", "contrary to", "interpretation"], "q": "A discussão interpreta os resultados no contexto de outras evidências (outras revisões sobre o mesmo tema)?", "full": "Interpretação com comparação a outras revisões ou evidências.", "partial": "Interpreta os resultados sem compará-los a outros trabalhos.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23b", "title": "Limitações da evidência incluída", "applies": "O-O", "method": "L", "sec": ["discussion"], "kw": ["limitations of the primary studies", "quality of primary studies", "threats to validity", "small samples", "risk of bias", "applicability"], "q": "Discute limitações da evidência incluída (completude, aplicabilidade, incertezas, risco de viés dos estudos primários)?", "full": "Discute limitações dos estudos primários e seu efeito nas conclusões.", "partial": "Menciona limitações da evidência de forma genérica.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23c", "title": "Limitações do processo da revisão", "applies": "OOO", "method": "L", "sec": ["discussion", "methods"], "kw": ["threats to validity", "limitations", "bias", "single reviewer", "language", "search limited", "incomplete", "mitigation"], "q": "Discute limitações do processo da revisão (apenas questões não tratadas antes nos Métodos) e seu efeito possível nos resultados?", "full": "Discute limitações do processo e o possível impacto nos achados.", "partial": "Lista limitações do processo sem discutir o impacto.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "23d", "title": "Implicações para prática, política e pesquisa", "applies": "OOO", "method": "L", "sec": ["discussion"], "kw": ["implications", "practitioners", "researchers", "future research", "recommendations", "future work", "research agenda"], "q": "Discute implicações dos resultados para prática, política e pesquisa futura (em mapeamentos basta pesquisa futura)?", "full": "Implicações claras e ligadas aos resultados.", "partial": "Cita implicações ou trabalhos futuros de forma genérica.", "item": "23", "absent": "Não há informação sobre isso no artigo."}, {"code": "24a", "title": "Registro da revisão", "applies": "PPP", "method": "RL", "rule": "registration", "sec": ["methods", "abstract"], "kw": ["registered", "registration", "PROSPERO", "OSF", "protocol"], "q": "Informa onde a revisão foi registrada (nome do registro e número) ou declara que não foi registrada?", "full": "Registro com nome e número, ou declaração de não registro.", "partial": "Menciona protocolo ou registro sem os dados do registro.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "24b", "title": "Acesso ao protocolo", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["protocol", "review protocol", "pre-defined", "available at", "publicly available"], "q": "Indica onde o protocolo pode ser acessado ou declara que não houve protocolo?", "full": "Indica onde o protocolo está ou declara que não existe.", "partial": "Diz que seguiu um protocolo, sem indicar onde acessá-lo.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "24c", "title": "Emendas ao protocolo", "applies": "OPO", "method": "L", "sec": ["methods"], "kw": ["deviation", "amendment", "changes to the protocol", "changed from protocol", "protocol deviations", "adapted"], "q": "Descreve e explica alterações em relação ao registro ou protocolo (ou declara que não houve)?", "full": "Descreve e justifica as alterações (ou declara que não houve).", "partial": "Menciona desvios sem explicar.", "item": "24", "absent": "Não há informação sobre isso no artigo."}, {"code": "25", "title": "Financiamento e apoio", "applies": "OOO", "method": "RL", "rule": "funding", "sec": ["acknowledgments", "back"], "kw": ["funded by", "funding", "financial support", "grant", "sponsor", "supported by", "no funding"], "q": "Descreve fontes de apoio financeiro e não financeiro e o papel dos financiadores (ou declara que não houve)?", "full": "Fontes e papel dos financiadores (ou declaração de ausência).", "partial": "Cita agradecimento ou apoio sem detalhar a fonte ou o papel.", "item": "25", "absent": "Não há informação sobre isso no artigo."}, {"code": "26", "title": "Conflitos de interesse", "applies": "OOO", "method": "RL", "rule": "coi", "sec": ["acknowledgments", "back"], "kw": ["conflict of interest", "competing interests", "declare"], "q": "Declara os conflitos de interesse dos autores (ou a ausência deles)?", "full": "Declaração presente.", "partial": "Menção vaga, sem declaração clara.", "item": "26", "absent": "Não há informação sobre isso no artigo."}, {"code": "27", "title": "Disponibilidade de dados, código e materiais", "applies": "PPP", "method": "R", "rule": "data_availability", "sec": ["back", "methods"], "kw": ["Zenodo", "Figshare", "GitHub", "replication package", "supplementary material", "data availability"], "q": "Informa quais materiais (formulários, dados extraídos, código) estão públicos e onde?", "full": "Repositório público citado.", "partial": "Diz que há material suplementar ou dados sob demanda, sem repositório.", "item": "27", "absent": "Não há informação sobre isso no artigo."}]};
 const ITEMS = CL.items, CHECKS = CL.checks;
 const TYPE_INDEX = { quant: 0, mapping: 1, qual: 2 };
 const TYPES = { quant: 'Revisão sistemática quantitativa/mista', mapping: 'Mapeamento sistemático', qual: 'Revisão qualitativa' };
@@ -326,7 +342,7 @@ function buildDoc(pages) {
   return doc;
 }
 
-async function extractPdf(buf) {
+async function extractPdf(buf, onProgress = () => {}) {
   const pdfjs = await ensurePdfJs();
   const pdf = await pdfjs.getDocument({ data: buf, isEvalSupported: false }).promise;
   const pages = [];
@@ -343,6 +359,7 @@ async function extractPdf(buf) {
     }
     push();
     pages.push(lines);
+    onProgress(i, Math.min(pdf.numPages, 80));
   }
   return buildDoc(pages);
 }
@@ -646,20 +663,34 @@ function el(tag, attrs = {}, ...kids) {
   return n;
 }
 const fmt = n => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
-const state = { type: 'quant', practice: false, doc: null, cls: null, results: null, overrides: {}, report: null, isDemo: true, filter: 'all', open: new Set(), filename: '', ctl: null, usedAi: false, stopped: null };
+const state = { type: 'quant', practice: false, doc: null, cls: null, results: null, overrides: {}, report: null, isDemo: true, filter: 'all', open: new Set(), filename: '', ctl: null, usedAi: false, stopped: null, busy: false };
 let sample = null, downloads = null;
+
+// progresso discreto: barra fina no topo + barra no painel de envio
+function progress(pct, label) {
+  pct = Math.max(0, Math.min(100, pct));
+  $('prog').hidden = false; $('topBar').style.opacity = '.85';
+  $('progBar').style.width = $('topBar').style.width = pct + '%';
+  $('progPct').textContent = Math.round(pct) + '%';
+  $('progTrack').setAttribute('aria-valuenow', String(Math.round(pct)));
+  if (label) $('progLabel').textContent = label;
+}
+function progressDone() {
+  progress(100);
+  setTimeout(() => { $('prog').hidden = true; $('topBar').style.opacity = '0'; setTimeout(() => { $('topBar').style.width = '0'; }, 400); }, 500);
+}
 
 function setAiNote(text, kind = '') { const n = $('aiNote'); n.textContent = text; n.className = 'note ' + kind; }
 (async () => {
-  if (!window.claude || !window.claude.use) { setAiNote('Fora do Claude: só os itens verificáveis por regra são pontuados (modo parcial).', 'warn'); applyAiAvailability(); return; }
+  if (!window.claude || !window.claude.use) { setAiNote('Fora do Claude: só os itens verificáveis por regra são pontuados (modo parcial).', 'warn'); applyAvailability(); return; }
   try { [sample, downloads] = await Promise.all([window.claude.use('sample'), window.claude.use('downloads')]); } catch (e) { sample = null; }
   setAiNote(sample ? 'O Claude julga os itens que exigem leitura. Na primeira avaliação ele pede sua permissão; o uso conta na sua cota do Claude.' : 'O Claude não está disponível nesta visualização: só os itens verificáveis por regra são pontuados (modo parcial).', sample ? '' : 'warn');
-  applyAiAvailability();
+  applyAvailability();
 })();
-function applyAiAvailability() {
+function applyAvailability() {
   $('useAiRow').hidden = !sample; $('useAi').checked = !!sample;
   $('demoAiBtn').hidden = !(sample && state.isDemo && !state.usedAi);
-  $('exportBtn').hidden = !(downloads && state.report);
+  $('pdfBtn').hidden = $('jsonBtn').hidden = !(downloads && state.report);
 }
 
 // envio
@@ -669,35 +700,31 @@ drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') 
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
-
-function showSteps(list) { $('progPanel').hidden = false; $('steps').replaceChildren(...list.map(([id, label]) => el('li', { id: 'st-' + id }, label))); }
-function step(id, status, label) { const li = $('st-' + id); if (!li) return; li.className = status; if (label) li.textContent = label; }
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); fileInput.value = ''; });
 
 async function handleFile(f) {
+  if (state.busy) return;
   if (!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf') { setAiNote('Envie um arquivo PDF.', 'bad'); return; }
   if (f.size > 40 * 1024 * 1024) { setAiNote('O PDF passa de 40 MB; envie uma versão menor.', 'bad'); return; }
-  state.filename = f.name; $('typePanel').hidden = true;
-  showSteps([['read', 'Ler o PDF'], ['class', 'Classificar o tipo de estudo']]);
-  $('stopBtn').hidden = true;
-  step('read', 'on');
+  state.busy = true; state.filename = f.name; $('typePanel').hidden = true; $('stopBtn').hidden = true;
+  progress(2, 'Carregando o leitor de PDF…');
   try {
-    const doc = await extractPdf(await f.arrayBuffer());
+    const doc = await extractPdf(await f.arrayBuffer(), (i, n) => progress(5 + 85 * i / n, `Lendo o PDF: página ${i} de ${n}`));
     if (doc.text.trim().length < 500) throw new Error('Não encontrei texto no PDF. Ele pode ser escaneado (imagem); envie um PDF com texto selecionável.');
-    step('read', 'done'); step('class', 'on');
+    progress(95, 'Identificando o tipo de estudo…');
     state.pending = doc; state.cls = classifyRules(doc);
-    step('class', 'done');
+    progressDone();
     showType();
   } catch (e) {
-    $('progPanel').hidden = true;
+    $('prog').hidden = true; $('topBar').style.width = '0';
     setAiNote(e.message || 'Não consegui ler o PDF.', 'bad');
-  }
+  } finally { state.busy = false; }
 }
 
 function showType() {
   const c = state.cls;
   $('typePanel').hidden = false;
-  $('detLine').textContent = `Detectado: ${c.type ? TYPES[c.type] : 'tipo não identificado'} (confiança ${Math.round(c.confidence * 100)}%, por ${c.source}).`;
+  $('detLine').textContent = `Detectado: ${c.type ? TYPES[c.type] : 'tipo não identificado'} (confiança ${Math.round(c.confidence * 100)}%).`;
   $('detReasons').replaceChildren(...c.reasons.map(r => el('li', {}, r)));
   const unsupported = !c.type || !c.isSystematic;
   $('detWarn').hidden = !unsupported;
@@ -711,41 +738,30 @@ $('goBtn').addEventListener('click', () => evaluate(state.pending || state.doc, 
 $('demoAiBtn').addEventListener('click', () => evaluate(demoDoc(), 'quant', false, true, true));
 $('retypeBtn').addEventListener('click', () => { if (state.doc && !state.isDemo) { state.pending = state.doc; showType(); } });
 $('stopBtn').addEventListener('click', () => state.ctl && state.ctl.abort());
-$('exportBtn').addEventListener('click', async () => {
-  if (!downloads || !state.report) return;
-  const r = state.report;
-  const data = { arquivo: state.filename || 'exemplo', titulo: state.doc.title, tipo: TYPES[r.type], investiga_praticas_de_pesquisa: r.practice,
-    classificacao: RATINGS[r.rating], provisoria: r.provisional, score: r.pct, pontos: { obtidos: r.got, possiveis_verificados: r.vPossible, possiveis: r.possible },
-    falhas_criticas: r.flaws.map(x => x.id), fraquezas: r.weak.map(x => x.id),
-    itens: r.items.map(x => ({ item: x.id, titulo: x.title, critico: x.critical, aplicabilidade: x.kind, peso: x.weight, avaliacao: x.s == null ? null : VERDICT[x.s], pontos: x.points, justificativa: x.justification, ajuste_humano: x.override != null ? VERDICT[x.override] : null,
-      subitens: x.subs.map(s => ({ subitem: s.c.code, aplicabilidade: s.kind, nota: s.r ? s.r.score : null, evidencia: s.r ? s.r.evidence : '', pagina: s.r ? s.r.page : null, falta: s.r ? s.r.missing : '', metodo: s.r ? s.r.method : null })) })),
-    metodo: 'SEGRESS Tabela 9; Sim/Parcial/Não = 1/0,5/0; peso 2 nos itens críticos (Tabela 2 do SEGRESS); classificação pela regra do AMSTAR 2.' };
-  try { await downloads.save({ filename: 'segress-' + (state.filename || 'exemplo').replace(/\.pdf$/i, '') + '.json', data: JSON.stringify(data, null, 2) }); } catch (e) { /* o leitor recusou */ }
-});
 
 async function evaluate(doc, type, practice, useAi, isDemo) {
-  if (!doc) return;
-  state.ctl = new AbortController();
-  $('goBtn').disabled = true; $('demoAiBtn').disabled = true;
-  const st = [['rules', 'Verificações por regra']]; if (useAi) st.push(['llm', 'Julgamento pelo Claude']); st.push(['score', 'Calcular a avaliação']);
-  showSteps(st); $('stopBtn').hidden = !useAi; step('rules', 'on');
+  if (!doc || state.busy) return;
+  state.busy = true; state.ctl = new AbortController();
+  $('goBtn').disabled = true; $('demoAiBtn').disabled = true; $('stopBtn').hidden = !useAi;
+  progress(3, 'Verificações por regra…');
   try {
     const { results, stopped } = await runChecks(doc, type, practice, {
       sample: useAi ? sample : null, signal: state.ctl.signal,
       onStep: (s, done, total) => {
-        if (s === 'rules') { step('rules', 'done'); step('llm', 'on', 'Julgamento pelo Claude (pode levar alguns minutos)'); }
-        if (s === 'llm') step('llm', done === total ? 'done' : 'on', `Julgamento pelo Claude: ${done} de ${total} grupos`);
+        if (s === 'rules') progress(useAi ? 10 : 90, useAi ? 'O Claude está lendo os itens (pode levar alguns minutos)…' : 'Calculando a avaliação…');
+        if (s === 'llm') progress(10 + 85 * done / total, `O Claude julgou ${done} de ${total} grupos de itens`);
       },
     });
-    step('score', 'done');
     Object.assign(state, { doc, results, overrides: {}, isDemo, type, practice, usedAi: useAi && !stopped, stopped, pending: null });
     state.open.clear();
     render();
-    $('progPanel').hidden = true;
+    progressDone();
     if (!isDemo) $('typePanel').hidden = true;
     $('reportPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    $('prog').hidden = true; setAiNote('A avaliação falhou: ' + (e.message || e.code || 'erro desconhecido'), 'bad');
   } finally {
-    $('goBtn').disabled = false; $('demoAiBtn').disabled = false;
+    state.busy = false; $('goBtn').disabled = false; $('demoAiBtn').disabled = false; $('stopBtn').hidden = true;
   }
 }
 
@@ -756,38 +772,66 @@ const STOP_MSG = {
   cancelled: 'Avaliação interrompida; os itens não julgados ficaram sem avaliação.',
   session_expired: 'Sua sessão no Claude expirou; entre de novo e avalie outra vez.',
 };
-const list = xs => xs.map(x => itemLabel(x.id)).join(', ');
-const itens = xs => ` (${xs.length === 1 ? 'item' : 'itens'} ${list(xs)})`;
+const labelList = xs => xs.map(x => itemLabel(x.id)).join(', ');
+const itens = xs => ` (${xs.length === 1 ? 'item' : 'itens'} ${labelList(xs)})`;
+
+// prioridade: críticos com Não, demais com Não, críticos parciais, demais parciais, não verificados
+function priorities(r) {
+  const req = r.items.filter(x => x.kind === 'O');
+  const rank = x => x.s === 0 ? (x.critical ? 0 : 1) : x.s === 0.5 ? (x.critical ? 2 : 3) : x.s == null ? 4 : 9;
+  return req.filter(x => rank(x) < 9).sort((a, b) => rank(a) - rank(b));
+}
 
 function render() {
   const r = state.report = score(state.results, state.type, state.practice, state.overrides);
-  $('rKind').textContent = state.isDemo ? (state.usedAi ? 'Exemplo: revisão fictícia, avaliada com o Claude' : 'Exemplo: revisão fictícia, só regras') : 'Avaliação';
-  const rt = $('rRating'); rt.className = 'rating r-' + r.rating; rt.textContent = RATINGS[r.rating] + (r.provisional ? '*' : '');
+  $('rKind').textContent = state.isDemo ? (state.usedAi ? 'Exemplo · com o Claude' : 'Exemplo · só regras') : 'Avaliação';
+  $('rVerdict').className = 'verdict r-' + r.rating;
+  $('rRating').textContent = RATINGS[r.rating] + (r.provisional ? '*' : '');
   $('rScore').textContent = r.vPossible ? fmt(r.pct) : '—';
-  $('rPoints').textContent = r.vPossible ? `${fmt(r.got)} de ${fmt(r.vPossible)} pontos · ${r.met} de ${r.required} itens obrigatórios com Sim` : '';
-  $('rBar').style.width = (r.vPossible ? r.pct : 0) + '%';
-  $('rBarWrap').setAttribute('aria-label', `Score ${fmt(r.pct)} de 100`);
+  $('rPoints').textContent = r.vPossible ? `${fmt(r.got)} de ${fmt(r.vPossible)} pontos` : 'sem itens verificados';
   $('rTitle').textContent = state.doc.title || state.filename;
-  $('rMeta').textContent = `${TYPES[r.type]}${r.practice ? ' · investiga práticas de pesquisa' : ''} · ${r.required} itens obrigatórios para este tipo`;
-  $('rCounts').replaceChildren(...[
-    el('span', { class: 'cnt' + (r.flaws.length ? ' bad' : '') }, `Falhas críticas: ${r.flaws.length}`, r.flaws.length ? itens(r.flaws) : ''),
-    el('span', { class: 'cnt' + (r.weak.length > 1 ? ' warn' : '') }, `Fraquezas: ${r.weak.length}`, r.weak.length ? itens(r.weak) : ''),
-    r.pending.length ? el('span', { class: 'cnt' }, `Não verificados: ${r.pending.length}`) : null].filter(Boolean));
+  $('rMeta').textContent = `${TYPES[r.type]}${r.practice ? ' · investiga práticas de pesquisa' : ''} · ${r.met} de ${r.required} itens obrigatórios com Sim`;
+  $('rFacts').replaceChildren(...[
+    el('span', { class: r.flaws.length ? 'bad' : '' }, `Falhas críticas: ${r.flaws.length}`, r.flaws.length ? itens(r.flaws) : ''),
+    el('span', { class: r.weak.length > 1 ? 'warn' : '' }, `Fraquezas: ${r.weak.length}`, r.weak.length ? itens(r.weak) : ''),
+  ]);
+  // gráfico discreto: distribuição dos itens obrigatórios
+  const req = r.items.filter(x => x.kind === 'O');
+  const n = { sim: req.filter(x => x.s === 1).length, par: req.filter(x => x.s === 0.5).length, nao: req.filter(x => x.s === 0).length, pen: req.filter(x => x.s == null).length };
+  const total = req.length || 1;
+  $('rDist').replaceChildren(...[['sim', 'd-sim'], ['par', 'd-par'], ['nao', 'd-nao'], ['pen', 'd-pen']].filter(([k]) => n[k]).map(([k, c]) => el('i', { class: c, style: `width:${100 * n[k] / total}%` })));
+  $('rDist').setAttribute('aria-label', `Itens obrigatórios: ${n.sim} Sim, ${n.par} Parcial, ${n.nao} Não, ${n.pen} não verificados`);
+  $('rDistKey').replaceChildren(...[
+    el('span', { class: 'k-sim' }, `${n.sim} Sim`), el('span', { class: 'k-par' }, `${n.par} Parcial`), el('span', { class: 'k-nao' }, `${n.nao} Não`),
+    n.pen ? el('span', { class: 'k-pen' }, `${n.pen} não verificados`) : null].filter(Boolean));
   $('rSecs').replaceChildren(...r.bySection.map(s => el('div', { class: 'sec' }, el('span', {}, s.name), el('div', { class: 'bar', role: 'img', 'aria-label': `${s.name}: ${Math.round(s.score)}%` }, el('i', { style: `width:${s.score}%` })), el('span', {}, Math.round(s.score) + '%'))));
   const flags = [];
   if (state.stopped && STOP_MSG[state.stopped]) flags.push(el('div', { class: 'note warn' }, STOP_MSG[state.stopped]));
   if (r.rating === 'ind') flags.push(el('div', { class: 'note' }, 'Classificação indeterminada: menos de 70% dos pontos obrigatórios foram verificados. Os itens que exigem leitura precisam do Claude.'));
-  else if (r.provisional) flags.push(el('div', { class: 'note' }, `* Classificação provisória: ${r.pending.length} item(ns) obrigatório(s) não verificado(s) (${list(r.pending)}).`));
+  else if (r.provisional) flags.push(el('div', { class: 'note' }, `* Classificação provisória: ${r.pending.length} item(ns) obrigatório(s) não verificado(s)${itens(r.pending)}.`));
   if (r.weak.length >= 5 && r.rating === 'bom') flags.push(el('div', { class: 'note warn' }, 'Muitas fraquezas não críticas. Pelo AMSTAR 2, isso pode justificar rebaixar a classificação para Ruim, a critério do avaliador.'));
   $('rFlags').replaceChildren(...flags);
   $('retypeBtn').hidden = state.isDemo;
-  applyAiAvailability();
+  $('exportMsg').textContent = '';
+  renderRecs(r);
+  applyAvailability();
   renderFilters(); renderRows();
+}
+
+function renderRecs(r) {
+  const list = priorities(r).filter(x => x.s != null);
+  $('recPanel').hidden = !list.length;
+  $('recs').replaceChildren(...list.map(x => el('li', {},
+    el('span', { class: 'code' }, itemLabel(x.id)),
+    el('div', {},
+      el('div', {}, el('b', {}, x.title), ' ', verdictPill(x), x.critical ? el('span', { class: 'chips' }, el('span', { class: 'chip crit' }, 'crítico')) : null),
+      el('p', { class: 'why' }, x.justification),
+      el('p', {}, x.recommend, x.ref ? el('span', { class: 'small' }, ` (Material Suplementar do SEGRESS, seção ${x.ref})`) : null)))));
 }
 
 const FILTERS = [['all', 'Todos'], ['crit', 'Críticos'], ['no', 'Não'], ['partial', 'Parcial'], ['review', 'Revisar'], ['na', 'Não se aplica']];
 function renderFilters() {
-  $('filters').replaceChildren(...FILTERS.map(([k, label]) => el('button', { 'aria-pressed': String(state.filter === k), onclick: () => { state.filter = k; renderFilters(); renderRows(); } }, label)));
+  $('filters').replaceChildren(...FILTERS.map(([k, label]) => el('button', { class: 'chipbtn', 'aria-pressed': String(state.filter === k), onclick: () => { state.filter = k; renderFilters(); renderRows(); } }, label)));
 }
 function verdictPill(x) {
   if (x.kind === '-') return el('span', { class: 'pill sn' }, 'N/A');
@@ -804,15 +848,15 @@ function renderRows() {
     out.push(el('div', { class: 'group-h' }, SECTION_NAMES[sec]));
     for (const x of rows) {
       const open = state.open.has(x.id), id = 'd-' + x.id;
-      out.push(el('div', { class: 'row' + (x.critical ? ' crit' : '') },
+      out.push(el('div', { class: 'row' + (open ? ' open' : '') },
         el('button', { class: 'row-h', 'aria-expanded': String(open), 'aria-controls': id, onclick: () => { open ? state.open.delete(x.id) : state.open.add(x.id); renderRows(); } },
           el('span', { class: 'code', title: x.id === 'opening' ? 'Opening (sem número no PRISMA)' : 'Item ' + x.id }, itemLabel(x.id)),
-          el('span', { class: 'ttl' }, x.title, el('span', { class: 'chips' },
+          el('span', { class: 'ttl' }, el('b', {}, x.title), el('span', { class: 'chips' },
             x.critical ? el('span', { class: 'chip crit' }, 'crítico') : null,
             x.kind === 'P' ? el('span', { class: 'chip' }, 'opcional') : null,
             x.override != null ? el('span', { class: 'chip' }, 'ajustado') : (x.review && x.kind !== '-' ? el('span', { class: 'chip rev' }, 'revisar') : null)),
             el('span', { class: 'just' }, x.justification)),
-          el('span', { class: 'pts' }, x.kind === 'O' ? (x.points == null ? `— / ${x.weight}` : `${fmt(x.points)} / ${x.weight}`) : x.kind === 'P' ? 'fora do score' : ''),
+          el('span', { class: 'pts' }, x.kind === 'O' ? (x.points == null ? `— / ${x.weight}` : `${fmt(x.points)} / ${x.weight}`) : x.kind === 'P' ? 'opcional' : ''),
           verdictPill(x)),
         open ? detail(x, id) : null));
     }
@@ -824,20 +868,147 @@ function detail(x, id) {
   const opts = [['auto', 'Auto'], [0, 'Não'], [0.5, 'Parcial'], [1, 'Sim']];
   const cur = x.override == null ? 'auto' : x.override;
   return el('div', { class: 'detail', id },
-    el('div', {}, el('strong', {}, 'Justificativa: '), x.justification),
+    x.kind !== '-' && x.s !== 1 ? el('div', { class: 'reco' }, el('strong', {}, 'Recomendação: '), x.recommend, x.ref ? el('span', { class: 'small' }, ` (Material Suplementar do SEGRESS, seção ${x.ref})`) : null) : null,
     ...x.subs.filter(s => s.kind !== '-').map(s => {
       const r = s.r || {};
       return el('div', { class: 'sub' },
-        el('div', {}, el('span', { class: 'code' }, s.c.code === 'opening' ? 'Ab.' : s.c.code), ' ', el('strong', {}, s.c.title),
-          ' ', el('span', { class: 'small' }, s.kind === 'P' ? '(opcional para este tipo)' : ''), ' ',
-          r.score == null ? el('span', { class: 'pill sn' }, '—') : el('span', { class: 'pill ' + (r.score === 1 ? 's1' : r.score === 0.5 ? 's05' : 's0') }, VERDICT[r.score])),
+        el('div', {}, el('span', { class: 'code' }, s.c.code === 'opening' ? 'Ab.' : s.c.code), ' ', el('strong', {}, s.c.title), ' ',
+          r.score == null ? el('span', { class: 'pill sn' }, '—') : el('span', { class: 'pill ' + (r.score === 1 ? 's1' : r.score === 0.5 ? 's05' : 's0') }, VERDICT[r.score]),
+          s.kind === 'P' ? el('span', { class: 'small' }, '  opcional para este tipo') : null),
         el('div', { class: 'small' }, s.c.q),
-        r.evidence ? el('blockquote', {}, '“' + r.evidence + '”', r.page ? el('span', { class: 'small' }, `  (p. ${r.page})`) : null) : null,
+        r.evidence ? el('blockquote', {}, '“' + r.evidence + '”', r.page ? el('span', { class: 'small' }, `  p. ${r.page}`) : null) : null,
         r.missing ? el('div', {}, el('strong', {}, 'Falta: '), r.missing) : null,
         el('div', { class: 'small' }, `Método: ${r.method || '—'} · confiança: ${r.confidence == null ? '—' : Math.round(r.confidence * 100) + '%'}${r.note && r.method !== 'regra' ? ' · ' + r.note : ''}`));
     }),
-    x.kind !== '-' ? el('div', {}, el('span', { class: 'small' }, 'Ajuste humano do item: '), el('span', { class: 'seg', role: 'group', 'aria-label': 'Ajustar avaliação do item ' + x.id },
+    x.kind !== '-' ? el('div', {}, el('span', { class: 'small' }, 'Ajuste humano do item  '), el('span', { class: 'seg', role: 'group', 'aria-label': 'Ajustar avaliação do item ' + x.id },
       ...opts.map(([v, label]) => el('button', { 'aria-pressed': String(cur === v), onclick: () => { if (v === 'auto') delete state.overrides[x.id]; else state.overrides[x.id] = v; render(); } }, label)))) : null);
+}
+
+// ---------- exportação ----------
+const today = () => new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+const baseName = () => 'segress-' + (state.filename || 'exemplo').replace(/\.pdf$/i, '').replace(/[^\p{L}\p{N}_-]+/gu, '-').slice(0, 60);
+async function save(filename, data) {
+  try { await downloads.save({ filename, data }); $('exportMsg').textContent = ''; }
+  catch (e) { $('exportMsg').textContent = e && e.code === 'declined' ? '' : 'Não foi possível salvar o arquivo aqui.'; }
+}
+
+$('pdfBtn').addEventListener('click', async () => {
+  if (!downloads || !state.report) return;
+  $('pdfBtn').disabled = true; $('exportMsg').textContent = 'Montando o relatório…';
+  try {
+    const pm = await ensurePdfMake();
+    const blob = await new Promise((ok, fail) => { try { pm.createPdf(reportDoc(state.report)).getBlob(ok); } catch (e) { fail(e); } });
+    await save(baseName() + '.pdf', blob);
+  } catch (e) { $('exportMsg').textContent = e.message || 'Não foi possível montar o PDF.'; }
+  finally { $('pdfBtn').disabled = false; }
+});
+$('jsonBtn').addEventListener('click', () => {
+  if (!downloads || !state.report) return;
+  const r = state.report;
+  const data = { arquivo: state.filename || 'exemplo', titulo: state.doc.title, data: new Date().toISOString().slice(0, 10), tipo: TYPES[r.type], investiga_praticas_de_pesquisa: r.practice,
+    classificacao: RATINGS[r.rating], provisoria: r.provisional, score: r.pct, pontos: { obtidos: r.got, possiveis_verificados: r.vPossible, possiveis: r.possible },
+    falhas_criticas: r.flaws.map(x => x.id), fraquezas: r.weak.map(x => x.id),
+    itens: r.items.map(x => ({ item: x.id, titulo: x.title, critico: x.critical, aplicabilidade: x.kind, peso: x.weight, avaliacao: x.s == null ? null : VERDICT[x.s], pontos: x.points, justificativa: x.justification,
+      recomendacao: x.s === 1 || x.kind === '-' ? null : x.recommend, ajuste_humano: x.override != null ? VERDICT[x.override] : null,
+      subitens: x.subs.map(s => ({ subitem: s.c.code, aplicabilidade: s.kind, nota: s.r ? s.r.score : null, evidencia: s.r ? s.r.evidence : '', pagina: s.r ? s.r.page : null, falta: s.r ? s.r.missing : '', metodo: s.r ? s.r.method : null })) })),
+    metodo: 'SEGRESS, Tabela 9; Sim/Parcial/Não = 1/0,5/0; peso 2 nos itens críticos (Tabela 2 do SEGRESS); classificação pela regra do AMSTAR 2.' };
+  save(baseName() + '.json', JSON.stringify(data, null, 2));
+});
+
+// relatório em PDF (pdfmake): resumo, gráfico simples, prioridades com recomendações, tabela dos 28 itens, método
+function reportDoc(r) {
+  const C = { ink: '#1f2b2d', mute: '#66777a', line: '#e2e9e7', soft: '#f3f7f6', accent: '#3a7f79', good: '#2e8558', warn: '#a8761a', bad: '#bb5448', na: '#9aa8aa' };
+  const RC = { otimo: C.good, bom: C.accent, ruim: C.warn, mruim: C.bad, ind: C.mute };
+  const VC = s => s === 1 ? C.good : s === 0.5 ? C.warn : s === 0 ? C.bad : C.na;
+  const vText = x => x.kind === '-' ? 'N/A' : x.s == null ? 'Não verificado' : VERDICT[x.s];
+  const req = r.items.filter(x => x.kind === 'O');
+  const n = { sim: req.filter(x => x.s === 1).length, par: req.filter(x => x.s === 0.5).length, nao: req.filter(x => x.s === 0).length, pen: req.filter(x => x.s == null).length };
+  const W = 499; // largura útil (A4 com margens de 48)
+  const box = (label, value, color) => ({ stack: [{ text: label, fontSize: 8, color: C.mute, characterSpacing: .4 }, { text: value, fontSize: 15, bold: true, color: color || C.ink, margin: [0, 2, 0, 0] }], margin: [0, 0, 0, 0] });
+  const bar = (pct, w, color) => ({ canvas: [{ type: 'rect', x: 0, y: 3, w, h: 5, r: 2.5, color: C.line }, { type: 'rect', x: 0, y: 3, w: Math.max(0.01, w * pct / 100), h: 5, r: 2.5, color }] });
+  const dist = () => {
+    let x = 0; const parts = [['sim', C.good], ['par', C.warn], ['nao', C.bad], ['pen', C.na]].filter(([k]) => n[k]);
+    const tot = req.length || 1;
+    return { canvas: parts.map(([k, c]) => { const w = W * n[k] / tot; const rect = { type: 'rect', x, y: 0, w: Math.max(0, w - 2), h: 7, r: 2, color: c }; x += w; return rect; }) };
+  };
+  const pr = priorities(r);
+  const recBlocks = pr.length ? pr.map((x, i) => ({
+    unbreakable: true, margin: [0, 0, 0, 10],
+    table: { widths: [22, '*'], body: [[
+      { text: String(i + 1), color: C.mute, fontSize: 9, margin: [0, 1, 0, 0] },
+      { stack: [
+        { text: [{ text: `Item ${itemLabel(x.id) === 'Ab.' ? 'Opening' : x.id} · ${x.title}`, bold: true }, x.critical ? { text: '  crítico', color: C.accent, fontSize: 8.5 } : '', { text: '   ' + vText(x), color: VC(x.s), bold: true, fontSize: 9 }] },
+        { text: x.s == null ? 'Não verificado automaticamente: confira este item no artigo.' : x.justification, color: C.mute, fontSize: 9, margin: [0, 3, 0, 3] },
+        { text: [{ text: 'Recomendação: ', bold: true }, x.recommend, x.ref ? { text: ` (Material Suplementar do SEGRESS, seção ${x.ref})`, color: C.mute } : ''], fontSize: 9.5 },
+      ] }]] },
+    layout: { hLineWidth: () => 0, vLineWidth: () => 0, fillColor: () => C.soft, paddingLeft: () => 8, paddingRight: () => 8, paddingTop: () => 7, paddingBottom: () => 7 },
+  })) : [{ text: 'Nenhuma melhoria necessária nos itens obrigatórios: todos foram avaliados como Sim.', color: C.mute }];
+  const optionalMissing = r.items.filter(x => x.kind === 'P' && x.s != null && x.s < 1);
+  const tableBody = [[
+    { text: 'Item', style: 'th' }, { text: 'Descrição', style: 'th' }, { text: 'Avaliação', style: 'th' }, { text: 'Pontos', style: 'th', alignment: 'right' }, { text: 'Justificativa', style: 'th' }]];
+  for (const sec of SECTION_ORDER) {
+    const rows = r.items.filter(x => x.section === sec);
+    if (!rows.length) continue;
+    tableBody.push([{ text: SECTION_NAMES[sec].toUpperCase(), colSpan: 5, fontSize: 7.5, bold: true, color: C.mute, characterSpacing: .6, margin: [0, 4, 0, 0] }, {}, {}, {}, {}]);
+    for (const x of rows) tableBody.push([
+      { text: x.id === 'opening' ? 'Op.' : x.id, color: C.accent, bold: x.critical },
+      { text: [x.title, x.critical ? { text: ' (crítico)', color: C.mute, fontSize: 7.5 } : '', x.kind === 'P' ? { text: ' (opcional)', color: C.mute, fontSize: 7.5 } : ''] },
+      { text: vText(x), color: x.kind === '-' ? C.na : VC(x.s), bold: x.kind !== '-' },
+      { text: x.kind === 'O' ? (x.points == null ? `— / ${x.weight}` : `${fmt(x.points)} / ${x.weight}`) : '—', alignment: 'right', color: C.mute },
+      { text: x.justification, color: C.mute, fontSize: 8 },
+    ]);
+  }
+  return {
+    pageSize: 'A4', pageMargins: [48, 52, 48, 56],
+    info: { title: 'SEGRESS-Score · ' + (state.doc.title || state.filename), subject: 'Avaliação do relato segundo o SEGRESS' },
+    defaultStyle: { font: 'Roboto', fontSize: 9.5, lineHeight: 1.25, color: C.ink },
+    styles: { h1: { fontSize: 17, bold: true, lineHeight: 1.15 }, h2: { fontSize: 12.5, bold: true, margin: [0, 18, 0, 8] }, th: { bold: true, fontSize: 8, color: C.mute }, eyebrow: { fontSize: 8, color: C.accent, bold: true, characterSpacing: 1 } },
+    footer: (page, pages) => ({ margin: [48, 18, 48, 0], columns: [{ text: 'SEGRESS-Score · avaliação do relato pelo SEGRESS (IEEE TSE, 2023)', fontSize: 7.5, color: C.mute }, { text: `${page} / ${pages}`, alignment: 'right', fontSize: 7.5, color: C.mute }] }),
+    content: [
+      { text: 'RELATÓRIO DE AVALIAÇÃO · SEGRESS', style: 'eyebrow' },
+      { text: state.doc.title || state.filename || 'Artigo avaliado', style: 'h1', margin: [0, 6, 0, 4] },
+      { text: `${state.filename ? 'Arquivo: ' + state.filename + ' · ' : ''}${TYPES[r.type]}${r.practice ? ' (investiga práticas de pesquisa)' : ''} · ${today()}${state.isDemo ? ' · exemplo fictício' : ''}`, color: C.mute, fontSize: 8.5 },
+      { margin: [0, 16, 0, 0], table: { widths: ['*', '*', '*', '*'], body: [[
+        box('CLASSIFICAÇÃO', RATINGS[r.rating] + (r.provisional ? '*' : ''), RC[r.rating]),
+        box('SCORE', r.vPossible ? fmt(r.pct) + ' / 100' : '—'),
+        box('PONTOS', r.vPossible ? `${fmt(r.got)} de ${fmt(r.vPossible)}` : '—'),
+        box('ITENS COM SIM', `${n.sim} de ${r.required}`),
+      ]] }, layout: { hLineWidth: () => 0, vLineWidth: () => 0, fillColor: () => C.soft, paddingLeft: () => 10, paddingRight: () => 10, paddingTop: () => 9, paddingBottom: () => 9 } },
+      { margin: [0, 10, 0, 0], text: [
+        { text: `Falhas críticas: ${r.flaws.length}`, bold: true, color: r.flaws.length ? C.bad : C.ink }, r.flaws.length ? ` (${r.flaws.map(x => x.id).join(', ')})` : '', '     ',
+        { text: `Fraquezas: ${r.weak.length}`, bold: true, color: r.weak.length > 1 ? C.warn : C.ink }, r.weak.length ? ` (${r.weak.map(x => itemLabel(x.id) === 'Ab.' ? 'Opening' : x.id).join(', ')})` : '',
+        r.pending.length ? `     Não verificados: ${r.pending.length}` : ''] },
+      r.provisional ? { text: '* Classificação provisória: há itens obrigatórios não verificados.', color: C.mute, fontSize: 8, margin: [0, 4, 0, 0] } : '',
+      r.rating === 'ind' ? { text: 'Classificação indeterminada: menos de 70% dos pontos obrigatórios foram verificados.', color: C.mute, fontSize: 8, margin: [0, 4, 0, 0] } : '',
+      { text: 'Itens obrigatórios', style: 'h2' },
+      dist(),
+      { text: `${n.sim} Sim · ${n.par} Parcial · ${n.nao} Não${n.pen ? ` · ${n.pen} não verificados` : ''}`, color: C.mute, fontSize: 8.5, margin: [0, 5, 0, 10] },
+      { table: { widths: [110, '*', 34], body: r.bySection.map(s => [{ text: s.name, color: C.mute }, bar(s.score, 330, C.accent), { text: Math.round(s.score) + '%', alignment: 'right' }]) }, layout: 'noBorders' },
+      { text: 'Recomendações de melhoria, por prioridade', style: 'h2' },
+      { text: 'Primeiro os itens críticos ausentes, depois os demais ausentes e os parciais. Cada recomendação segue a Tabela 9 do SEGRESS.', color: C.mute, fontSize: 8.5, margin: [0, -4, 0, 10] },
+      ...recBlocks,
+      optionalMissing.length ? { text: [{ text: 'Opcionais, mas recomendados: ', bold: true }, optionalMissing.map(x => `item ${x.id} (${x.title}): ${x.recommend}`).join(' ')], fontSize: 9, color: C.mute, margin: [0, 4, 0, 0] } : '',
+      { text: 'Avaliação item a item', style: 'h2' },
+      { table: { headerRows: 1, dontBreakRows: true, widths: [24, 128, 52, 38, '*'], body: tableBody },
+        layout: { hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 0 : .5, hLineColor: () => C.line, vLineWidth: () => 0, paddingTop: () => 4, paddingBottom: () => 4, paddingLeft: () => 4, paddingRight: () => 4 }, fontSize: 8.5 },
+      { text: 'Método', style: 'h2' },
+      { ul: [
+        'Itens: os 28 itens da Tabela 9 do SEGRESS (os 27 do PRISMA 2020 e o item Opening), com aplicabilidade por tipo de estudo. Itens com subitens recebem Sim só quando todos os subitens obrigatórios são atendidos.',
+        'Pontuação por item: Sim = 1, Parcial = 0,5, Não = 0 (Kitchenham et al., 2009). Informação ausente conta como Não.',
+        'Peso 2 nos itens críticos 5, 6, 7, 8, 11, 13, 15, 16, 22 e 23, que correspondem às informações essenciais da Tabela 2 do SEGRESS (Budgen et al., 2018); peso 1 nos demais. Score = pontos obtidos ÷ pontos possíveis nos itens obrigatórios verificados.',
+        'Classificação pela regra do AMSTAR 2 (Shea et al., 2017): Ótimo, nenhuma falha crítica e até 1 fraqueza; Bom, nenhuma falha crítica e 2 ou mais fraquezas; Ruim, 1 falha crítica; Muito ruim, 2 ou mais. Falha crítica = item crítico com Não; fraqueza = item não crítico com Não.',
+        `Julgamento: regras automáticas e, ${state.usedAi ? 'neste relatório,' : 'quando disponível,'} leitura pelo Claude com citação literal conferida no texto. ${r.items.some(x => x.override != null) ? 'Itens marcados como ajustados tiveram o veredito alterado pelo avaliador.' : ''}`,
+        'A avaliação mede a qualidade do relato, não a validade científica da revisão.',
+      ], color: C.mute, fontSize: 8.5 },
+      { text: 'Referências', style: 'h2' },
+      { ol: [
+        'Kitchenham, B., Madeyski, L., Budgen, D. SEGRESS: Software Engineering Guidelines for REporting Secondary Studies. IEEE Transactions on Software Engineering, 49(3), 2023. doi:10.1109/TSE.2022.3174092',
+        'Budgen, D., Brereton, P., Drummond, S., Williams, N. Reporting systematic reviews: Some lessons from a tertiary study. Information and Software Technology, 95, 2018.',
+        'Kitchenham, B., et al. Systematic literature reviews in software engineering – A systematic literature review. Information and Software Technology, 51(1), 2009.',
+        'Shea, B. J., et al. AMSTAR 2: a critical appraisal tool for systematic reviews. BMJ, 358:j4008, 2017.',
+      ], color: C.mute, fontSize: 8.5 },
+    ],
+  };
 }
 
 // estado inicial: o exemplo avaliado só com regras

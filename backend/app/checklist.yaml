@@ -1,123 +1,196 @@
 # Checklist SEGRESS (Kitchenham, Madeyski e Budgen, IEEE TSE 49(3), 2023, Tabela 9).
-# items: os 28 itens da Tabela 9 (27 do PRISMA 2020 + "Opening"). critical = item ligado às informações
-#   essenciais da Tabela 2 do artigo (Budgen et al., 2018): itens 5, 6, 7, 8, 11, 13, 15, 16, 22 e 23.
-# checks: os subitens verificados (10a, 13d...). Cada check pertence a um item (campo item).
-#   applies: três letras [quantitativa/mista, mapeamento, qualitativa]: O = obrigatório, P = opcional, - = não se aplica.
-#   method: R = regra; RL = regra pré-filtra e LLM julga; L = só LLM.
-# Itens 14 e 15 também não se aplicam a estudos que investigam práticas de pesquisa em ES (Tabela 9).
+# 
+# recommend: o que relatar quando o item não é atendido (a partir da Tabela 9). ref: seção do Material Suplementar do SEGRESS.
 items:
 - id: opening
   title: Abertura (Opening)
   section: introducao
   critical: false
+  recommend: Abra a Introdução com o problema maior e sua importância, defina a área de pesquisa, estabeleça o nicho (a lacuna de conhecimento)
+    e então foque nele.
+  ref: ''
 - id: '1'
   title: Título
   section: titulo_resumo
   critical: false
+  recommend: Inclua no título o tipo de estudo (revisão sistemática, mapeamento sistemático, estudo terciário, revisão qualitativa ou de métodos
+    mistos) e o tema revisado.
+  ref: '2.1'
 - id: '2'
   title: Resumo estruturado
   section: titulo_resumo
   critical: false
+  recommend: Estruture o resumo em Contexto (com a importância da pesquisa), Objetivo, Métodos, Resultados, Limitações (opcional) e Conclusão.
+  ref: '2.2'
 - id: '3'
   title: Justificativa (rationale)
   section: introducao
   critical: false
+  recommend: Explique por que a revisão é necessária (atualização, tema novo, novos resultados empíricos ou tema maduro sem revisão anterior)
+    e como ela contribui para o problema maior.
+  ref: '2.3'
 - id: '4'
   title: Objetivos e questões de pesquisa
   section: introducao
   critical: false
+  recommend: Liste as questões de pesquisa e explique como cada uma contribui para o problema maior.
+  ref: '2.4'
 - id: '5'
   title: Critérios de elegibilidade
   section: metodos
   critical: true
+  recommend: Especifique os critérios de inclusão e exclusão a partir das características dos estudos e justifique as restrições da busca (datas
+    de início e fim, idioma, periódicos, tipo de publicação). Diga como as revisões existentes encontradas na busca serão usadas.
+  ref: '3.1'
 - id: '6'
   title: Fontes de informação
   section: metodos
   critical: true
+  recommend: Liste todas as fontes consultadas (bases, referências de estudos primários, pesquisadores contatados) com a data final da busca em
+    cada uma. Use o checklist baseado no PRISMA-S do Material Suplementar.
+  ref: '3.4'
 - id: '7'
   title: Estratégia de busca
   section: metodos
   critical: true
+  recommend: 'Apresente a estratégia completa: a string de busca de cada base, snowballing, busca manual, busca de literatura não publicada e
+    como a completude foi avaliada. Se houver revisões anteriores, diga como contribuíram para a busca.'
+  ref: '3.5'
 - id: '8'
   title: Processo de seleção
   section: metodos
   critical: true
+  recommend: Descreva as fases da seleção, quantos avaliadores analisaram cada estudo, como as discordâncias foram resolvidas, as ferramentas
+    usadas e a concordância medida (por exemplo, kappa).
+  ref: '3.6'
 - id: '9'
   title: Processo de coleta de dados
   section: metodos
   critical: false
+  recommend: Diga quantos revisores extraíram os dados de cada estudo, se trabalharam de forma independente, como os dados foram conferidos ou
+    confirmados com os autores e quais ferramentas foram usadas.
+  ref: '3.7'
 - id: '10'
   title: Itens de dados (10a, 10b)
   section: metodos
   critical: false
+  recommend: Liste e defina os desfechos buscados e sua relação com as questões de pesquisa (10a, exceto em mapeamentos) e as demais variáveis
+    extraídas, incluindo o esquema de classificação e as suposições sobre dados ausentes (10b).
+  ref: 3.8 e 3.9
 - id: '11'
   title: Avaliação de risco de viés dos estudos
   section: metodos
   critical: true
+  recommend: 'Descreva como o risco de viés (qualidade) dos estudos foi avaliado: instrumento ou critérios, quantos avaliadores por estudo e se
+    trabalharam de forma independente.'
+  ref: '3.10'
 - id: '12'
   title: Medidas de efeito
   section: metodos
   critical: false
+  recommend: Para cada desfecho, especifique a medida de efeito usada na síntese (por exemplo, diferença de médias padronizada ou razão de risco).
+  ref: '3.11'
 - id: '13'
   title: Métodos de análise e síntese (13a a 13f)
   section: metodos
   critical: true
+  recommend: Descreva como os estudos foram agrupados em cada síntese (13a), a preparação dos dados ou a codificação (13b), as tabelas e gráficos
+    (13c), o método de síntese com justificativa (13d), a análise de sensibilidade (13e) e a exploração da heterogeneidade (13f), conforme o tipo
+    de estudo.
+  ref: 3.12 a 3.18
 - id: '14'
   title: Avaliação de viés de relato (publicação)
   section: metodos
   critical: false
+  recommend: Descreva como foi avaliado o risco de viés por resultados ausentes (viés de publicação), por exemplo pelo rigor da busca ou, em meta-análises,
+    por funnel plot.
+  ref: '3.19'
 - id: '15'
   title: Avaliação de certeza da evidência
   section: metodos
   critical: true
+  recommend: Descreva o método usado para avaliar a certeza (confiança) no corpo de evidência de cada desfecho, como GRADE ou GRADE-CERQual.
+  ref: '3.20'
 - id: '16'
   title: Seleção de estudos (16a, 16b)
   section: resultados
   critical: true
+  recommend: Relate o número de registros em cada etapa, da busca à inclusão, de preferência com diagrama de fluxo e estatísticas de concordância
+    (16a). Cite os estudos quase incluídos e o motivo da exclusão (16b).
+  ref: 4.1 e 4.2
 - id: '17'
   title: Características dos estudos
   section: resultados
   critical: false
+  recommend: Cite cada estudo incluído e apresente suas características, de preferência em tabela.
+  ref: '4.3'
 - id: '18'
   title: Risco de viés nos estudos
   section: resultados
   critical: false
+  recommend: Apresente a avaliação de risco de viés (qualidade) de cada estudo incluído e a concordância entre os avaliadores.
+  ref: '4.4'
 - id: '19'
   title: Resultados dos estudos individuais
   section: resultados
   critical: false
+  recommend: Para cada estudo, apresente as estatísticas por grupo e a estimativa de efeito com sua precisão (em revisões qualitativas, os principais
+    achados), de preferência em tabelas ou gráficos.
+  ref: '4.5'
 - id: '20'
   title: Resultados das análises e sínteses (20a a 20d)
   section: resultados
   critical: false
+  recommend: Para cada síntese ou questão de pesquisa, resuma as características e o risco de viés dos estudos que contribuem (20a) e apresente
+    as estimativas com intervalo e heterogeneidade (20b), a sensibilidade ou os casos desviantes (20c) e as causas de heterogeneidade (20d), conforme
+    o tipo de estudo.
+  ref: 4.6 a 4.10
 - id: '21'
   title: Vieses de relato (resultados)
   section: resultados
   critical: false
+  recommend: Apresente a avaliação de viés de publicação de cada síntese; em meta-análises, a heterogeneidade entre estudos e o funnel plot.
+  ref: '4.11'
 - id: '22'
   title: Certeza da evidência (resultados)
   section: resultados
   critical: true
+  recommend: Para cada achado, apresente a certeza (confiança) da evidência, por exemplo numa tabela de resumo de achados com o nível GRADE ou
+    CERQual.
+  ref: '4.12'
 - id: '23'
   title: Discussão (23a a 23d)
   section: discussao
   critical: true
+  recommend: Interprete os resultados frente a outras revisões (23a) e discuta as limitações da evidência (23b), as limitações do processo ainda
+    não tratadas nos Métodos (23c) e as implicações para prática, política e pesquisa futura (23d).
+  ref: 5.2 a 5.5
 - id: '24'
   title: Registro e protocolo (24a a 24c)
   section: outras
   critical: false
+  recommend: Informe o registro da revisão com nome e número, ou que ela não foi registrada (24a), onde o protocolo pode ser acessado (24b) e
+    as alterações feitas em relação a ele, com justificativa (24c).
+  ref: 6.2 a 6.4
 - id: '25'
   title: Apoio e financiamento
   section: outras
   critical: false
+  recommend: Declare as fontes de apoio financeiro e não financeiro e o papel dos financiadores, ou que não houve financiamento.
+  ref: '6.5'
 - id: '26'
   title: Conflitos de interesse
   section: outras
   critical: false
+  recommend: Declare os conflitos de interesse dos autores ou a ausência deles.
+  ref: '6.6'
 - id: '27'
   title: Disponibilidade de dados, código e materiais
   section: outras
   critical: false
+  recommend: Disponibilize em repositório público (Zenodo, Figshare, OSF) os formulários de extração, os dados extraídos, os dados das análises
+    e o código, e diga onde estão.
+  ref: '6.7'
 checks:
 - code: opening
   title: 'Abertura: contexto, nicho e lacuna'

@@ -90,6 +90,6 @@ frontend/        página única (upload, confirmação de tipo, relatório)
 
 ## Versão web sem servidor (`web/`)
 
-`web/segress-score.html` roda inteira no navegador: lê o PDF com pdf.js, aplica as regras e a nota em JavaScript
+`web/segress-score.html` roda inteira no navegador: lê o PDF com pdf.js (com barra de progresso), aplica as regras e a avaliação em JavaScript, mostra as recomendações de melhoria e exporta um relatório em PDF (pdfmake)
 e, quando publicada como página no Claude, usa o próprio Claude da página para julgar os itens que exigem leitura
 (sem chave de API; o uso conta na cota do Claude de quem avalia). Gere-a a partir do checklist com `python web/build.py`.
