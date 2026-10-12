@@ -1,12 +1,11 @@
 # SEGRESS-Score
 
 Serviço web que recebe o PDF de uma revisão sistemática de engenharia de software, classifica o tipo
-(quantitativa, mapeamento, qualitativa), executa 42 verificações derivadas da Tabela 9 do SEGRESS
+(quantitativa, mapeamento, qualitativa), avalia os 28 itens da Tabela 9 do SEGRESS
 (Kitchenham, Madeyski e Budgen, *IEEE TSE* 49(3), 2023) e devolve uma nota de 0 a 100 com a evidência
 encontrada em cada item.
 
-> A nota mede a **qualidade do relato**, não a validade científica da revisão. Pesos, limiares de nível e
-> regra de teto são propostas iniciais e precisam ser calibrados com avaliadores humanos.
+> A avaliação mede a **qualidade do relato**, não a validade científica da revisão.
 
 ## Executar
 
@@ -26,29 +25,41 @@ Com Docker: `docker compose up --build` (porta 8000; dados em `./data`).
 | Modo | Condição | Comportamento |
 | --- | --- | --- |
 | Completo | `ANTHROPIC_API_KEY` definida | Itens `RL` e `L` são julgados pelo LLM, com citação literal conferida no texto |
-| Parcial | sem chave | Itens `R` pontuados por regra; `RL` com nota provisória por regra; `L` ficam "não verificados" e saem do cálculo. Se a cobertura do peso obrigatório for menor que 70%, o nível não é atribuído |
+| Parcial | sem chave | Itens `R` pontuados por regra; `RL` com nota provisória por regra; `L` ficam "não verificados" e saem do cálculo. Se menos de 70% dos pontos obrigatórios forem verificados, a classificação fica indeterminada |
 
 ## Fluxo
 
 1. `POST /evaluations` (multipart `file`) extrai o texto e classifica o tipo (status `needs_confirmation`).
-2. O usuário confirma ou corrige o tipo: `POST /evaluations/{id}/confirm` `{study_type, tertiary}`.
+2. O usuário confirma ou corrige o tipo: `POST /evaluations/{id}/confirm` `{study_type, practice}`.
 3. As verificações rodam em segundo plano; `GET /evaluations/{id}` informa status e progresso.
-4. `GET /evaluations/{id}/report` devolve nota, nível, nota por seção e os itens com evidência, página e o que falta.
-5. `PATCH /evaluations/{id}/items/{code}` `{score}` registra ajuste humano e recalcula a nota.
+4. `GET /evaluations/{id}/report` devolve classificação, score, pontos, falhas críticas e os 28 itens com justificativa, evidência, página e o que falta.
+5. `PATCH /evaluations/{id}/items/{code}` `{score}` registra ajuste humano do item (code = 1 a 27 ou opening) e recalcula.
 6. `PATCH /evaluations/{id}/study-type` muda o tipo e reavalia.
 
 Artigos que não parecem revisões sistemáticas (narrativas, opinião, diretrizes) são sinalizados na classificação;
 o usuário pode forçar o tipo, ciente de que a nota perde o sentido.
 
-## Escala
+## Como a avaliação é feita
 
-- Cada item: 1 (completo), 0,5 (parcial), 0 (ausente). Itens obrigatórios (O) formam a nota-base ponderada por peso (1 a 3);
-  opcionais (P) dão até 5 pontos de bônus; não aplicáveis (–) saem do cálculo.
-- Teto: item crítico obrigatório (peso 3) com nota 0 limita o nível a C.
-- Níveis: A (90–100), B (75–89), C (60–74), D (40–59), E (0–39).
-- Estudo terciário: itens 14 e 15 deixam de se aplicar.
+- **28 itens** da Tabela 9 do SEGRESS: os 27 do PRISMA 2020 mais o item "Opening" da Introdução. Os itens 10, 13, 16, 20, 23 e 24
+  são verificados pelos seus subitens (43 verificações no total).
+- **Aplicabilidade por tipo de estudo**, conforme a Tabela 9: revisão quantitativa/mista, mapeamento sistemático (também estudos
+  terciários sobre métodos de pesquisa) e revisão qualitativa. Os itens 14 e 15 não se aplicam a estudos que investigam práticas
+  de pesquisa em ES.
+- **Cada item:** Sim = 1, Parcial = 0,5, Não = 0, a pontuação usada por Kitchenham et al. (2009) nos critérios DARE em estudos
+  terciários de ES. Item com subitens: Sim se todos os subitens obrigatórios são atendidos, Não se nenhum, Parcial nos demais casos.
+  Informação ausente conta como Não.
+- **Peso 2** nos 10 itens críticos (5, 6, 7, 8, 11, 13, 15, 16, 22, 23), que correspondem às informações essenciais da Tabela 2 do
+  SEGRESS (Budgen et al., 2018); peso 1 nos demais.
+- **Score** (0–100) = pontos obtidos ÷ pontos possíveis nos itens obrigatórios. Itens opcionais aparecem, mas não entram no score.
+- **Classificação** pela regra do AMSTAR 2 (Shea et al., BMJ 2017): falha crítica = item crítico com Não; fraqueza = item não
+  crítico com Não. Ótimo: nenhuma falha crítica e até 1 fraqueza; Bom: nenhuma falha crítica e 2 ou mais fraquezas; Ruim: 1 falha
+  crítica; Muito ruim: 2 ou mais. Os autores do AMSTAR 2 desaconselham somar notas para a classificação geral, por isso o score
+  é um complemento para comparar artigos, e a classificação vem da regra de falhas críticas.
+- Cada item traz a justificativa, os subitens, a citação literal do artigo com a página e o que falta. O avaliador pode ajustar
+  o veredito de qualquer item.
 
-O checklist (pesos, aplicabilidade, perguntas e critérios) fica em `backend/app/checklist.yaml`; altere-o sem mexer no código.
+O checklist (itens, subitens, aplicabilidade, perguntas e critérios) fica em `backend/app/checklist.yaml`.
 
 ## Estrutura
 
@@ -57,11 +68,11 @@ backend/app/
   main.py        rotas FastAPI e tarefas em segundo plano
   extract.py     PyMuPDF -> título, resumo, trechos por seção e página
   classify.py    tipo de estudo e se é revisão sistemática (regras + LLM opcional)
-  checklist.yaml os 42 itens
+  checklist.yaml os 28 itens e os 43 subitens
   rules.py       verificações por regra
   llm.py         verificação por LLM com saída estruturada e conferência da citação
   pipeline.py    recuperação de trechos e orquestração
-  scoring.py     fórmula, teto, níveis, nota por seção
+  scoring.py     pontos por item, score e classificação AMSTAR 2
   db.py          SQLite
 backend/tests/   pytest (nota, regras, pipeline com LLM simulado, API ponta a ponta)
 frontend/        página única (upload, confirmação de tipo, relatório)

@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import db, llm, pipeline
-from .checklist import TYPE_INDEX, load_checklist
+from .checklist import TYPE_INDEX, load_items
 from .classify import TYPES
 from .scoring import score
 
@@ -72,7 +72,7 @@ def task_check(eid: str, study_type: str, tertiary: bool) -> None:
             db.update(eid, progress=0.2 + 0.75 * done / total)
 
         results = pipeline.run_checks(doc, study_type, tertiary, progress)
-        report = score(load_checklist(), results, study_type, tertiary)
+        report = score(results, study_type, tertiary)
         report['llm'] = {'used': llm.available(), 'model': llm.model() if llm.available() else None}
         report['title'] = doc.title
         db.update(eid, results=results, report=report, status='done', progress=1.0, error=None)
@@ -85,17 +85,17 @@ def task_check(eid: str, study_type: str, tertiary: bool) -> None:
 
 class Confirm(BaseModel):
     study_type: str = Field(pattern='^(quant|mapping|qual)$')
-    tertiary: bool = False
+    practice: bool = Field(default=False, description='Investiga práticas de pesquisa em ES: itens 14 e 15 não se aplicam')
 
 
 class Override(BaseModel):
-    score: float | None = Field(default=None, description='0, 0.5, 1 ou null para remover o ajuste')
+    score: float | None = Field(default=None, description='Avaliação do item: 0 (Não), 0.5 (Parcial), 1 (Sim) ou null para remover o ajuste')
 
 
 def _public(ev: dict) -> dict:
     return {
         'id': ev['id'], 'filename': ev['filename'], 'status': ev['status'], 'progress': round(ev['progress'] or 0, 2),
-        'study_type': ev['study_type'], 'tertiary': ev['tertiary'], 'classification': ev.get('classification'),
+        'study_type': ev['study_type'], 'practice': ev['tertiary'], 'classification': ev.get('classification'),
         'error': ev.get('error'),
     }
 
@@ -112,7 +112,7 @@ def _get_or_404(eid: str) -> dict:
 @app.get('/health')
 def health() -> dict:
     return {'ok': True, 'llm': llm.available(), 'model': llm.model() if llm.available() else None,
-            'items': len(load_checklist())}
+            'items': len(load_items())}
 
 
 @app.post('/evaluations', status_code=202)
@@ -155,8 +155,8 @@ def confirm(eid: str, body: Confirm) -> dict:
         raise HTTPException(409, 'A avaliação ainda está em andamento.')
     if ev['status'] == 'failed' and not ev.get('classification'):
         raise HTTPException(409, 'A avaliação falhou antes da classificação; envie o PDF novamente.')
-    db.update(eid, status='checking', study_type=body.study_type, tertiary=body.tertiary, progress=0.2)
-    run_async(task_check, eid, body.study_type, body.tertiary)
+    db.update(eid, status='checking', study_type=body.study_type, tertiary=body.practice, progress=0.2)
+    run_async(task_check, eid, body.study_type, body.practice)
     return {'id': eid, 'status': 'checking'}
 
 
@@ -180,11 +180,15 @@ def override_item(eid: str, code: str, body: Override) -> dict:
         raise HTTPException(409, 'Só é possível ajustar itens de uma avaliação concluída.')
     if body.score is not None and body.score not in (0, 0.5, 1):
         raise HTTPException(422, 'score deve ser 0, 0.5 ou 1.')
+    if code not in {it['id'] for it in load_items()}:
+        raise HTTPException(404, 'Item inexistente. Use 1 a 27 ou opening.')
     results = ev['results']
-    if code not in results:
-        raise HTTPException(404, 'Item não avaliado nesta revisão (não se aplica ao tipo de estudo).')
-    results[code]['override'] = body.score
-    report = score(load_checklist(), results, ev['study_type'], ev['tertiary'])
+    overrides = results.setdefault('_overrides', {})
+    if body.score is None:
+        overrides.pop(code, None)
+    else:
+        overrides[code] = body.score
+    report = score(results, ev['study_type'], ev['tertiary'], overrides)
     report['llm'] = ev['report'].get('llm')
     report['title'] = ev['report'].get('title')
     db.update(eid, results=results, report=report)

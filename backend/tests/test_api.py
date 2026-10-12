@@ -6,7 +6,7 @@ from app.main import app
 def test_full_flow_rules_only(good_pdf):
     with TestClient(app) as c:
         h = c.get('/health').json()
-        assert h['items'] == 42 and h['llm'] is False
+        assert h['items'] == 28 and h['llm'] is False
         with open(good_pdf, 'rb') as f:
             r = c.post('/evaluations', files={'file': ('good.pdf', f, 'application/pdf')})
         assert r.status_code == 202
@@ -15,21 +15,21 @@ def test_full_flow_rules_only(good_pdf):
         assert ev['status'] == 'needs_confirmation' and ev['classification']['type'] == 'quant'
         assert c.get(f'/evaluations/{eid}/report').status_code == 409
 
-        r = c.post(f'/evaluations/{eid}/confirm', json={'study_type': 'quant', 'tertiary': False})
+        r = c.post(f'/evaluations/{eid}/confirm', json={'study_type': 'quant', 'practice': False})
         assert r.status_code == 202
         rep = c.get(f'/evaluations/{eid}/report').json()['report']
-        assert rep['study_type'] == 'quant' and len(rep['items']) == 42
-        assert rep['partial'] and rep['level'] is None       # sem LLM, cobertura baixa
+        assert rep['study_type'] == 'quant' and len(rep['items']) == 28
+        assert rep['rating'] == 'ind'                        # sem LLM, cobertura baixa
 
         # ajuste humano muda a nota efetiva
-        before = {i['code']: i for i in rep['items']}['3']['score']
+        before = {i['id']: i for i in rep['items']}['3']['score']
         r = c.patch(f'/evaluations/{eid}/items/3', json={'score': 1})
         assert r.status_code == 200
-        after = {i['code']: i for i in r.json()['report']['items']}['3']
-        assert before is None and after['score'] == 1 and after['override'] == 1
+        after = {i['id']: i for i in r.json()['report']['items']}['3']
+        assert before is None and after['verdict'] == 'Sim' and after['override'] == 1
 
         # mudar o tipo reavalia
-        c.patch(f'/evaluations/{eid}/study-type', json={'study_type': 'mapping', 'tertiary': False})
+        c.patch(f'/evaluations/{eid}/study-type', json={'study_type': 'mapping', 'practice': False})
         rep2 = c.get(f'/evaluations/{eid}/report').json()['report']
         assert rep2['study_type'] == 'mapping'
 

@@ -101,7 +101,7 @@
           <option value="qual">Revisão qualitativa</option>
         </select>
       </label>
-      <label><input type="checkbox" id="tertiary"> Estudo terciário (itens 14 e 15 não se aplicam)</label>
+      <label><input type="checkbox" id="tertiary"> Investiga práticas de pesquisa em ES (itens 14 e 15 não se aplicam)</label>
       <button id="goBtn">Avaliar</button>
     </div>
   </section>
@@ -128,14 +128,14 @@
       </div>
     </div>
     <div class="card">
-      <h2>Itens do checklist</h2>
+      <h2>Os 28 itens do SEGRESS</h2>
       <div class="tabs" id="filters"></div>
       <table>
-        <thead><tr><th>Item</th><th>Descrição</th><th>Peso</th><th>Nota</th><th>Método</th></tr></thead>
+        <thead><tr><th>Item</th><th>Descrição</th><th>Pontos</th><th>Avaliação</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
     </div>
-    <footer>A nota mede a qualidade do <em>relato</em>, não a validade científica dos resultados. Pesos e limiares de nível são propostas a calibrar com especialistas. Itens com "revisar" têm baixa confiança ou usam nota provisória e merecem conferência humana.</footer>
+    <footer>Cada item: Sim = 1, Parcial = 0,5, Não = 0 (Kitchenham et al., 2009); peso 2 nos itens críticos 5, 6, 7, 8, 11, 13, 15, 16, 22 e 23 (Tabela 2 do SEGRESS). Classificação pela regra do AMSTAR 2: Ótimo (sem falha crítica e até 1 fraqueza), Bom (sem falha crítica), Ruim (1 falha crítica), Muito ruim (2 ou mais). A avaliação mede a qualidade do <em>relato</em>, não a validade científica da revisão.</footer>
   </section>
 </main>
 
@@ -218,7 +218,7 @@ function showConfirm(ev) {
 $('goBtn').addEventListener('click', async () => {
   try {
     await api(`/evaluations/${current}/confirm`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ study_type: $('typeSel').value, tertiary: $('tertiary').checked }) });
+      body: JSON.stringify({ study_type: $('typeSel').value, practice: $('tertiary').checked }) });
     show('progressCard'); $('progressBar').style.width = '20%'; poll();
   } catch (e) { alert(e.message); }
 });
@@ -241,63 +241,67 @@ function pill(s) {
   return el('span', { class: 'pill ' + cls }, String(s).replace('.', ','));
 }
 
+const RCLASS = { otimo: 'lv-A', bom: 'lv-B', ruim: 'lv-C', mruim: 'lv-E', ind: 'lv-N' };
+const fmt = n => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
 function render(r) {
   show('reportCard');
   const rep = r.report;
-  $('rScore').textContent = rep.partial ? '—' : rep.score.toFixed(1).replace('.', ',');
+  $('rScore').textContent = rep.points_possible_verified ? fmt(rep.score) : '—';
   const lv = $('rLevel');
-  lv.textContent = rep.level ? `${rep.level} — ${rep.level_name}` : rep.level_name;
-  lv.className = 'badge lv-' + (rep.level || 'N');
+  lv.textContent = rep.rating_name + (rep.provisional ? ' (provisória)' : '');
+  lv.className = 'badge ' + RCLASS[rep.rating];
   $('rTitle').textContent = rep.title || r.filename;
-  $('rMeta').textContent = `${TYPES[rep.study_type]}${rep.tertiary ? ' (terciário)' : ''} · cobertura ${Math.round(rep.coverage * 100)}% do peso obrigatório · ` +
-    (rep.partial ? `nota parcial dos itens verificados: ${rep.score.toFixed(1).replace('.', ',')}` : `nota-base ${rep.base} + bônus ${rep.bonus}`);
+  $('rMeta').textContent = `${TYPES[rep.study_type]}${rep.practice ? ' · investiga práticas de pesquisa' : ''} · ${fmt(rep.points)} de ${fmt(rep.points_possible_verified)} pontos · ${rep.items_met} de ${rep.required_items} itens obrigatórios com Sim`;
   $('rSecs').replaceChildren(...SEC_ORDER.filter(k => rep.by_section[k]).map(k => {
     const s = rep.by_section[k];
     return el('div', { class: 'sec' }, el('span', {}, SEC_NAMES[k]), el('div', { class: 'bar' }, el('i', { style: `width:${s.score}%` })), el('span', {}, Math.round(s.score) + '%'));
   }));
   const notes = [];
-  if (rep.partial) notes.push(el('div', { class: 'note info' }, 'Nota parcial: menos de 70% do peso obrigatório foi verificado. Sem a API de LLM, itens que exigem leitura ficam fora do cálculo.'));
-  if (rep.capped) notes.push(el('div', { class: 'note warn' }, `Teto aplicado: item(ns) crítico(s) ausente(s) (${rep.critical_missing.join(', ')}) limitam o nível a C.`));
-  const nrev = rep.items.filter(i => i.needs_review && i.applies !== '-').length;
-  if (nrev) notes.push(el('div', { class: 'note info' }, `${nrev} item(ns) marcado(s) para revisão humana.`));
+  notes.push(el('div', { class: 'note ' + (rep.critical_flaws.length ? 'warn' : 'info') }, `Falhas críticas: ${rep.critical_flaws.length}${rep.critical_flaws.length ? ' (' + rep.critical_flaws.join(', ') + ')' : ''} · Fraquezas: ${rep.weaknesses.length}${rep.weaknesses.length ? ' (' + rep.weaknesses.join(', ') + ')' : ''}`));
+  if (rep.rating === 'ind') notes.push(el('div', { class: 'note info' }, 'Classificação indeterminada: menos de 70% dos pontos obrigatórios foram verificados. Sem a API de LLM, itens que exigem leitura ficam sem avaliação.'));
   $('rNotes').replaceChildren(...notes);
   renderFilters(rep); renderRows(rep);
 }
 
 function renderFilters(rep) {
-  const defs = [['all', 'Todos'], ['review', 'Revisar'], ['missing', 'Ausentes (0)'], ['partial', 'Parciais (0,5)']];
+  const defs = [['all', 'Todos'], ['crit', 'Críticos'], ['missing', 'Não'], ['partial', 'Parcial'], ['review', 'Revisar']];
   $('filters').replaceChildren(...defs.map(([k, label]) => el('button', { class: filter === k ? 'on' : '', onclick: () => { filter = k; renderFilters(rep); renderRows(rep); } }, label)));
+}
+function vpill(i) {
+  if (i.score === null || i.score === undefined) return el('span', { class: 'pill sn' }, '—');
+  return el('span', { class: 'pill ' + (i.score === 1 ? 's1' : i.score === 0.5 ? 's05' : 's0') }, i.verdict);
 }
 function renderRows(rep) {
   const items = rep.items.filter(i => i.applies !== '-').filter(i => {
-    if (filter === 'review') return i.needs_review;
+    if (filter === 'crit') return i.critical;
+    if (filter === 'review') return i.needs_review && i.override == null;
     if (filter === 'missing') return i.score === 0;
     if (filter === 'partial') return i.score === 0.5;
     return true;
   });
   const rows = [];
   for (const i of items) {
-    rows.push(el('tr', { class: 'item', onclick: () => { openCode = openCode === i.code ? null : i.code; renderRows(rep); } },
-      el('td', {}, i.code), el('td', {}, i.title, i.applies === 'P' ? el('span', { class: 'tag' }, 'opcional') : null, i.needs_review ? el('span', { class: 'tag' }, 'revisar') : null),
-      el('td', {}, String(i.weight)), el('td', {}, pill(i.score), i.override !== null && i.override !== undefined ? el('span', { class: 'tag' }, 'ajustado') : null),
-      el('td', {}, METHODS[i.method] || i.method)));
-    if (openCode === i.code) rows.push(detail(i));
+    rows.push(el('tr', { class: 'item', onclick: () => { openCode = openCode === i.id ? null : i.id; renderRows(rep); } },
+      el('td', {}, i.id === 'opening' ? 'Ab.' : i.id), el('td', {}, i.title, i.critical ? el('span', { class: 'tag' }, 'crítico') : null, i.applies === 'P' ? el('span', { class: 'tag' }, 'opcional') : null, i.needs_review && i.override == null ? el('span', { class: 'tag' }, 'revisar') : null),
+      el('td', {}, i.applies === 'O' ? (i.points == null ? `— / ${i.weight}` : `${fmt(i.points)} / ${i.weight}`) : '—'), el('td', {}, vpill(i)),
+      el('td', {}, i.override != null ? 'ajustado' : '')));
+    if (openCode === i.id) rows.push(detail(i));
   }
   $('rows').replaceChildren(...rows);
 }
 function detail(i) {
-  const sel = el('select', { 'aria-label': 'Ajustar nota', onchange: async (e) => {
+  const sel = el('select', { 'aria-label': 'Ajustar avaliação do item', onchange: async (e) => {
     const v = e.target.value === '' ? null : Number(e.target.value);
-    try { const r = await api(`/evaluations/${current}/items/${encodeURIComponent(i.code)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ score: v }) }); report = r.report; render(r); } catch (err) { alert(err.message); }
-  } },
-    el('option', { value: '' }, `Automática (${i.auto_score ?? '—'})`), el('option', { value: '0' }, '0'), el('option', { value: '0.5' }, '0,5'), el('option', { value: '1' }, '1'));
-  sel.value = i.override === null || i.override === undefined ? '' : String(i.override);
+    try { const r = await api(`/evaluations/${current}/items/${encodeURIComponent(i.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ score: v }) }); report = r.report; render(r); } catch (err) { alert(err.message); }
+  } }, el('option', { value: '' }, 'Automática'), el('option', { value: '0' }, 'Não'), el('option', { value: '0.5' }, 'Parcial'), el('option', { value: '1' }, 'Sim'));
+  sel.value = i.override == null ? '' : String(i.override);
   return el('tr', { class: 'detail' }, el('td', { colspan: '5' },
-    el('div', {}, el('strong', {}, 'Pergunta: '), i.question),
-    i.evidence ? el('blockquote', {}, i.evidence, i.page ? el('span', { class: 'tag' }, 'p. ' + i.page) : null) : el('div', { class: 'sub' }, 'Sem evidência localizada.'),
-    i.missing ? el('div', {}, el('strong', {}, 'O que falta: '), i.missing) : null,
-    i.note ? el('div', { class: 'sub' }, i.note) : null,
-    el('div', { class: 'row', style: 'margin-top:8px' }, el('span', { class: 'sub' }, `Confiança: ${i.confidence == null ? '—' : Math.round(i.confidence * 100) + '%'}`), el('label', {}, 'Ajuste humano: ', sel))));
+    el('div', {}, el('strong', {}, 'Justificativa: '), i.justification),
+    ...i.subitems.filter(s => s.applies !== '-').map(s => el('div', { style: 'margin-top:8px' },
+      el('strong', {}, `${s.code} ${s.title}`), ' ', s.score == null ? '—' : ({ 1: 'Sim', 0.5: 'Parcial', 0: 'Não' })[s.score],
+      s.evidence ? el('blockquote', {}, s.evidence, s.page ? el('span', { class: 'tag' }, 'p. ' + s.page) : null) : null,
+      s.missing ? el('div', { class: 'sub' }, 'Falta: ' + s.missing) : null)),
+    el('div', { class: 'row', style: 'margin-top:8px' }, el('label', {}, 'Ajuste humano: ', sel))));
 }
 </script>
 </body>
