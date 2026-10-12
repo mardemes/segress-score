@@ -1,0 +1,18 @@
+# Blueprint do Render: New > Blueprint > escolha este repositório.
+services:
+  - type: web
+    name: segress-score
+    runtime: docker
+    plan: starter            # o disco persistente exige plano pago
+    healthCheckPath: /health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false          # o Render pede o valor no primeiro deploy
+      - key: LLM_MODEL
+        value: claude-sonnet-4-6
+      - key: SEGRESS_DATA
+        value: /app/data
+    disk:
+      name: segress-data
+      mountPath: /app/data
+      sizeGB: 1
